@@ -1,8 +1,8 @@
-# CeltraTest
+# BannerAdTest
 
 ## Overview
 
-A minimal app that fetches and displays banner ads.  The goal is to test various pre-loading techniques and debug visibility issues like early auto-play. 
+A minimal app that fetches and displays banner ads.  The goal is to test various preloading techniques and debug visibility issues like early auto-play.  The UI is designed to mimic Flipboard.
 
 ## CocoaPods
 
@@ -10,35 +10,65 @@ This project uses [Cocoapods](https://guides.cocoapods.org/using/getting-started
 
 ## Functionality
 
-The app uses most of the screen to display ads, with the exception of a bottom bar, just like Flipboard.  The bottom bar contains three buttons:
+The app has a bottom bar with three buttons:
 
-**Reset**
+### Reset
 
 Cancels in-progress fetching/preloading and deletes downloaded ads.
 
 
-**Fetch/Present**
+### Fetch/Present
 
 Fetches a new ad with the unit ID selected in Settings. 
  
-If "Auto-Present" is off, the "Fetch" button will turn into a "Present" button once the ad finishes downloading/preloading.
+If "Auto-Present" is off, the "Fetch" button will turn into a "Present" button once the ad finishes fetching/preloading.
 
-**Settings**
+### Settings
 
-* *Unit ID -* The unit ID used for ad fetches.
+<dl>
+  <dt>Unit ID</dt>
+  <dd>The unit ID used for ad fetches.</dd>
+</dl>
 
-* *Preload -* Enables a hack that forces Celtra ads to preload before they appear.  Banners are attached to the main window behind other views for 5 seconds.
+<dl>
+  <dt>Preload</dt>
+  <dd>Enables a hack that forces banner ads to preload before they appear.  Banners are attached to the main window behind other views until they finish preloading, or a max time is reached (5 seconds).
+	<dl>
+	  <dt>Outside Screen Bounds</dt>
+	  <dd>Preload the banner outside of the screen's bounds.  Specifically, origin.x is set to the screen width.</dd>
+	</dl>
+	<dl>
+	  <dt>In Detached Parent View</dt>
+	  <dd>Preload the banner inside a parent view that's not part of the view hierarchy.</dd>
+	</dl>
+	<dl>
+	  <dt>Wait for Completion Event</dt>
+	  <dd>Preload the banner until it sends a completion event to the app.  When disabled the creative will load for a constant amount of time (currently 5 seconds).</dd>
+	</dl>
+  </dd>
+</dl>
 
-* *Preload > Outside Screen Bounds -* Preload the banner outside of the screen's bounds.  Specifically, origin.x is set to the screen width.
+<dl>
+  <dt>Hide Afterwards</dt>
+  <dd>Hide the banner after downloading and preloading finishes, and then unhide when presented.</dd>
+</dl>
 
-* *Preload > In Detached Parent View -* Preload the banner inside a parent view that's not part of the view hierarchy.
+<dl>
+  <dt>Remove From Parent Afterwards</dt>
+  <dd>Remove the banner from its parent view after downloading and preloading finishes.</dd>
+</dl>
 
-* *Preload > Wait for Completion Event -* Preload the banner until it sends a completion event to the app.  When disabled the creative will load for a constant amount of time (currently 5s).
+<dl>
+  <dt>Inject Visibility Javascript</dt>
+  <dd>Inject javascript when the ad is presented to let it know that it's *actually* visible.  Creatives can be modified to delay autoplay until this happens.</dd>
+</dl>
 
-* *Preload > Hide Afterwards -* Hide the banner after preloading finishes, and then unhide when presented.
+<dl>
+  <dt>Auto-Present</dt>
+  <dd>Automatically display ads when they finish downloading and preloading.  Turn this off to help isolate activity that happens before ads appear.</dd>
+</dl>
 
-* *Inject Visibility Javascript -* Inject javascript when the ad is presented to let it know that it's *actually* visible.  Creatives can be modified to delay autoplay until this happens.
-
-* *Auto-Present -* Automatically display ads when they finish downloading/preloading.  Turn this off to help isolate activity that happens before ads appear.
-
-* *Manual Impressions -* Manually report impressions rather than letting the SDK do it automatically.
+<dl>
+  <dt>Manual Impressions</dt>
+  <dd> Manually report impressions rather than letting the SDK do it automatically.</dd>
+</dl>
