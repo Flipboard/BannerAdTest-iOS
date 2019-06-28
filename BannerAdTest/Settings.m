@@ -1,32 +1,32 @@
 //
-//  DataModel.m
+//  Settings.m
 //  BannerAdTest
 //
 //  Created by Colin Caufield on 4/2/19.
 //  Copyright © 2019 Google. All rights reserved.
 //
 
-#import "DataModel.h"
+#import "Settings.h"
 
 static NSString *kFLUnitID = @"FLUnitID";
-static NSString *kFLShouldPreload = @"FLShouldPreload";
+static NSString *kFLPreload = @"FLPreload";
 static NSString *kFLPreloadOffscreen = @"FLPreloadOffscreen";
 static NSString *kFLPreloadInDetachedParentView = @"FLPreloadInDetachedParentView";
 static NSString *kFLWaitForPreloadingCompletionEvent = @"FLWaitForPreloadingCompletionEvent";
 static NSString *kFLHideAfterPreloading = @"FLHideAfterPreloading";
 static NSString *kFLRemoveFromParentAfterPreloading = @"FLRemoveFromParentAfterPreloading";
 static NSString *kFLInjectVisibilityJavascript = @"FLInjectVisibilityJavascript";
-static NSString *kFLShouldAutoPresent = @"FLShouldAutoPresent";
+static NSString *kFLAutoPresent = @"FLAutoPresent";
 static NSString *kFLManualImpressions = @"FLManualImpressions";
 
-@implementation DataModel
+@implementation Settings
 
 + (instancetype)shared
 {
-    static DataModel *shared = nil;
+    static Settings *shared = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        shared = [[DataModel alloc] init];
+        shared = [[Settings alloc] init];
     });
     return shared;
 }
@@ -39,7 +39,7 @@ static NSString *kFLManualImpressions = @"FLManualImpressions";
         self.unitID = [self defaultStringForKey:kFLUnitID fallback:@"/21709104563/testing/celtra/celtra18"];
         
         // Preload
-        self.shouldPreload = [self defaultBoolForKey:kFLShouldPreload fallback:YES];
+        self.preload = [self defaultBoolForKey:kFLPreload fallback:YES];
         
         // Preload offscreen
         // Doesn't seem to work, so leaving off by default.
@@ -61,7 +61,7 @@ static NSString *kFLManualImpressions = @"FLManualImpressions";
         self.injectVisibilityJavascript = [self defaultBoolForKey:kFLInjectVisibilityJavascript fallback:NO];
         
         // Auto-present
-        self.shouldAutoPresent = [self defaultBoolForKey:kFLShouldAutoPresent fallback:YES];
+        self.autoPresent = [self defaultBoolForKey:kFLAutoPresent fallback:YES];
         
         // Manual impressions
         self.manualImpressions = [self defaultBoolForKey:kFLManualImpressions fallback:NO];
@@ -133,10 +133,10 @@ static NSString *kFLManualImpressions = @"FLManualImpressions";
     [self.defaults setObject:unitID forKey:kFLUnitID];
 }
 
-- (void)setShouldPreload:(BOOL)shouldPreload
+- (void)setPreload:(BOOL)preload
 {
-    _shouldPreload = shouldPreload;
-    [self.defaults setBool:shouldPreload forKey:kFLShouldPreload];
+    _preload = preload;
+    [self.defaults setBool:preload forKey:kFLPreload];
 }
 
 - (void)setPreloadOffscreen:(BOOL)preloadOffscreen
@@ -175,10 +175,10 @@ static NSString *kFLManualImpressions = @"FLManualImpressions";
     [self.defaults setBool:inject forKey:kFLInjectVisibilityJavascript];
 }
 
-- (void)setShouldAutoPresent:(BOOL)shouldAutoPresent
+- (void)setAutoPresent:(BOOL)autoPresent
 {
-    _shouldAutoPresent = shouldAutoPresent;
-    [self.defaults setBool:shouldAutoPresent forKey:kFLShouldAutoPresent];
+    _autoPresent = autoPresent;
+    [self.defaults setBool:autoPresent forKey:kFLAutoPresent];
 }
 
 - (void)setManualImpressions:(BOOL)manualImpressions

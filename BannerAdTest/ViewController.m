@@ -4,7 +4,7 @@
 
 #import "ViewController.h"
 #import "SettingsViewController.h"
-#import "DataModel.h"
+#import "Settings.h"
 #import <WebKit/WebKit.h>
 
 @interface ViewController () <DFPBannerAdLoaderDelegate, GADUnifiedNativeAdLoaderDelegate, GADAppEventDelegate>
@@ -160,7 +160,7 @@
     NSLog(@"$$$$$ Fetching ad");
     
     // Unit ID.
-    NSString *unitID = DataModel.shared.unitID;
+    NSString *unitID = Settings.shared.unitID;
     
     // Banner and native types (unified request).
     NSArray *adTypes = @[kGADAdLoaderAdTypeDFPBanner, kGADAdLoaderAdTypeUnifiedNative];
@@ -186,19 +186,19 @@
     self.bannerHasBeenPreloaded = YES;
     
     // Hide after preloading?
-    if (DataModel.shared.hideAfterPreloading) {
+    if (Settings.shared.hideAfterPreloading) {
         NSLog(@"$$$$$ Hiding banner");
         self.bannerView.hidden = YES;
     }
     
     // Remove from hierarchy after preloading?
-    if (DataModel.shared.removeFromParentAfterPreloading) {
+    if (Settings.shared.removeFromParentAfterPreloading) {
         NSLog(@"$$$$$ Removing banner from parent");
         [self.bannerView removeFromSuperview];
     }
     
     // Auto-present?
-    if (DataModel.shared.shouldAutoPresent) {
+    if (Settings.shared.autoPresent) {
         // Layout
         [self layoutBannerView];
     }
@@ -240,7 +240,7 @@
     self.bannerView.appEventDelegate = self;
     
     // Register for manual impressions if desired.
-    if (DataModel.shared.manualImpressions) {
+    if (Settings.shared.manualImpressions) {
         self.bannerView.enableManualImpressions = YES;
     }
     
@@ -286,7 +286,7 @@
     
     // PRELOADING HACK
     // Banners won't preload unless they're attached to a window.
-    if (DataModel.shared.shouldPreload) {
+    if (Settings.shared.preload) {
         // Logging
         NSLog(@"$$$$$ Using preloading hack");
         NSLog(@"$$$$$ Adding banner to main window");
@@ -294,7 +294,7 @@
         // Two possible parent views for the preloading banner:
         // 1. A view that isn't part of the hierarchy (suggested by Google).
         // 2. The app's main window.
-        if (DataModel.shared.preloadInDetachedParentView) {
+        if (Settings.shared.preloadInDetachedParentView) {
             // Add the banner to the detached view so it can preload.
             [self.detachedParentView addSubview:self.bannerView];
         } else {
@@ -303,7 +303,7 @@
         }
         
         // Optionally move the banner outside of the screen frame.
-        if (DataModel.shared.preloadOffscreen) {
+        if (Settings.shared.preloadOffscreen) {
             NSLog(@"$$$$$ Moving banner outside of screen bounds");
             CGRect offscreenBannerFrame = self.bannerView.frame;
             offscreenBannerFrame.origin.x += UIScreen.mainScreen.bounds.size.width;
@@ -314,7 +314,7 @@
         self.bannerIsPreloading = YES;
         
         // Preload for a constant amount of time if we're not waiting for a completion event.
-        if (DataModel.shared.shouldPreload && !DataModel.shared.waitForPreloadingCompletionEvent) {
+        if (Settings.shared.preload && !Settings.shared.waitForPreloadingCompletionEvent) {
             // Wait a specified amount of time for preloading to complete.
             NSTimeInterval kPreloadingTime = 5.0;
             [self performSelector:@selector(loadingAndPreloadingDidFinish) withObject:nil afterDelay:kPreloadingTime];
@@ -340,7 +340,7 @@
     
     static NSString *kCeltraLoadedEventName = @"celtraLoaded";
     if ([name isEqual:kCeltraLoadedEventName]) {
-        if (DataModel.shared.shouldPreload && DataModel.shared.waitForPreloadingCompletionEvent) {
+        if (Settings.shared.preload && Settings.shared.waitForPreloadingCompletionEvent) {
             [self loadingAndPreloadingDidFinish];
         }
     }
@@ -425,13 +425,13 @@
     // The GMA SDK seems to think ads are visibile when they're not.
     // To work around this, inject javascript to tell the banner that it's *actually* visible.
     // Wait until the next runloop to avoid timing issues.
-    if (DataModel.shared.injectVisibilityJavascript) {
+    if (Settings.shared.injectVisibilityJavascript) {
         NSLog(@"$$$$$ Injecting banner visibility javascript");
         [self performSelector:@selector(setBannerVisibilityJavascriptFlagToYes) withObject:nil afterDelay:0.0];
     }
     
     // Manual impressions if desired.
-    if (DataModel.shared.manualImpressions) {
+    if (Settings.shared.manualImpressions) {
         NSLog(@"$$$$$ Firing manual impression");
         [self.bannerView recordImpression];
     }
@@ -541,7 +541,7 @@
 
 - (BOOL)canPresentBanner
 {
-    return self.bannerView != nil && ![self hasBannerSubview] && ![self isPreloadingAd] && !DataModel.shared.shouldAutoPresent;
+    return self.bannerView != nil && ![self hasBannerSubview] && ![self isPreloadingAd] && !Settings.shared.autoPresent;
 }
 
 @end

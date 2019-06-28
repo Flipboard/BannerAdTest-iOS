@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "DataModel.h"
+#import "Settings.h"
 
 @interface UnitIDViewController : UITableViewController
 

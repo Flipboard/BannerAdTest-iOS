@@ -14,7 +14,7 @@
 		50931E692151A9C60031BE3E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 50931E632151A9C60031BE3E /* main.m */; };
 		52B6C4E42253493C0055B764 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 52B6C4E32253493C0055B764 /* SettingsViewController.m */; };
 		52B6C4E722534E1F0055B764 /* UnitIDViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 52B6C4E622534E1F0055B764 /* UnitIDViewController.m */; };
-		52B6C4EA225359640055B764 /* DataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 52B6C4E9225359640055B764 /* DataModel.m */; };
+		52B6C4EA225359640055B764 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 52B6C4E9225359640055B764 /* Settings.m */; };
 		5F2DE6D7C4F30B74BB47ECBF /* libPods-BannerAdTest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DD9EF14B6E7CF50A0D052FC /* libPods-BannerAdTest.a */; };
 /* End PBXBuildFile section */
 
@@ -33,8 +33,8 @@
 		52B6C4E32253493C0055B764 /* SettingsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
 		52B6C4E522534E1F0055B764 /* UnitIDViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnitIDViewController.h; sourceTree = "<group>"; };
 		52B6C4E622534E1F0055B764 /* UnitIDViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UnitIDViewController.m; sourceTree = "<group>"; };
-		52B6C4E8225359640055B764 /* DataModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataModel.h; sourceTree = "<group>"; };
-		52B6C4E9225359640055B764 /* DataModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DataModel.m; sourceTree = "<group>"; };
+		52B6C4E8225359640055B764 /* Settings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
+		52B6C4E9225359640055B764 /* Settings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
 		B2CF70A79E61704AB8D13140 /* Pods-BannerAdTest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BannerAdTest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BannerAdTest/Pods-BannerAdTest.debug.xcconfig"; sourceTree = "<group>"; };
 		CF12E27E19A6C783001EB38A /* BannerAdTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BannerAdTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -65,10 +65,10 @@
 				50931E632151A9C60031BE3E /* main.m */,
 				50931E5B2151A9C60031BE3E /* AppDelegate.h */,
 				50931E5C2151A9C60031BE3E /* AppDelegate.m */,
-				52B6C4E8225359640055B764 /* DataModel.h */,
-				52B6C4E9225359640055B764 /* DataModel.m */,
 				50931E612151A9C60031BE3E /* ViewController.h */,
 				50931E622151A9C60031BE3E /* ViewController.m */,
+				52B6C4E8225359640055B764 /* Settings.h */,
+				52B6C4E9225359640055B764 /* Settings.m */,
 				52B6C4E22253493C0055B764 /* SettingsViewController.h */,
 				52B6C4E32253493C0055B764 /* SettingsViewController.m */,
 				52B6C4E522534E1F0055B764 /* UnitIDViewController.h */,
@@ -206,7 +206,7 @@
 				50931E692151A9C60031BE3E /* main.m in Sources */,
 				52B6C4E722534E1F0055B764 /* UnitIDViewController.m in Sources */,
 				50931E642151A9C60031BE3E /* AppDelegate.m in Sources */,
-				52B6C4EA225359640055B764 /* DataModel.m in Sources */,
+				52B6C4EA225359640055B764 /* Settings.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

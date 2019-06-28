@@ -1,5 +1,5 @@
 //
-//  DataModel.h
+//  Settings.h
 //  BannerAdTest
 //
 //  Created by Colin Caufield on 4/2/19.
@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface DataModel : NSObject
+@interface Settings : NSObject
 
 // Singleton
 + (instancetype)shared;
@@ -23,7 +23,7 @@
 @property (nonatomic, copy) NSString *unitID;
 
 // Should the preloading hack be used.
-@property (nonatomic, assign) BOOL shouldPreload;
+@property (nonatomic, assign) BOOL preload;
 
 // Place preloading views outside of the screen's bounds.
 @property (nonatomic, assign) BOOL preloadOffscreen;
@@ -45,7 +45,7 @@
 @property (nonatomic, assign) BOOL injectVisibilityJavascript;
 
 // Should the ad automatically be presented once it's done downloading (and preloading).
-@property (nonatomic, assign) BOOL shouldAutoPresent;
+@property (nonatomic, assign) BOOL autoPresent;
 
 // Manually report impressions rather than letting the SDK do it automatically.
 @property (nonatomic, assign) BOOL manualImpressions;

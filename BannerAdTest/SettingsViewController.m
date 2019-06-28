@@ -44,21 +44,21 @@
 - (void)updateUI
 {
     // Set unit ID label text.
-    self.unitIDLabel.text = DataModel.shared.prettyUnitID;
+    self.unitIDLabel.text = Settings.shared.prettyUnitID;
     
     // Set the switch states.
-    self.preloadSwitch.on = DataModel.shared.shouldPreload;
-    self.preloadOffscreenSwitch.on = DataModel.shared.preloadOffscreen;
-    self.preloadInDetechedParentViewSwitch.on = DataModel.shared.preloadInDetachedParentView;
-    self.waitForPreloadingCompletionEventSwitch.on = DataModel.shared.waitForPreloadingCompletionEvent;
-    self.hideAfterPreloadingSwitch.on = DataModel.shared.hideAfterPreloading;
-    self.removeFromParentAfterPreloadingSwitch.on = DataModel.shared.removeFromParentAfterPreloading;
-    self.injectVisibilityJavascriptSwitch.on = DataModel.shared.injectVisibilityJavascript;
-    self.autoPresentSwitch.on = DataModel.shared.shouldAutoPresent;
-    self.manualImpressionSwitch.on = DataModel.shared.manualImpressions;
+    self.preloadSwitch.on = Settings.shared.preload;
+    self.preloadOffscreenSwitch.on = Settings.shared.preloadOffscreen;
+    self.preloadInDetechedParentViewSwitch.on = Settings.shared.preloadInDetachedParentView;
+    self.waitForPreloadingCompletionEventSwitch.on = Settings.shared.waitForPreloadingCompletionEvent;
+    self.hideAfterPreloadingSwitch.on = Settings.shared.hideAfterPreloading;
+    self.removeFromParentAfterPreloadingSwitch.on = Settings.shared.removeFromParentAfterPreloading;
+    self.injectVisibilityJavascriptSwitch.on = Settings.shared.injectVisibilityJavascript;
+    self.autoPresentSwitch.on = Settings.shared.autoPresent;
+    self.manualImpressionSwitch.on = Settings.shared.manualImpressions;
     
     // If preloading is off then disable related cells.
-    [self setPreloadingSubcellsEnabled:DataModel.shared.shouldPreload];
+    [self setPreloadingSubcellsEnabled:Settings.shared.preload];
 }
 
 - (NSArray *)preloadingSubcells
@@ -78,55 +78,55 @@
 
 - (IBAction)preloadSwitchChanged:(UISwitch *)sender
 {
-    DataModel.shared.shouldPreload = sender.on;
+    Settings.shared.preload = sender.on;
     [self updateUI];
 }
 
 - (IBAction)preloadOffscreenChanged:(UISwitch *)sender
 {
-    DataModel.shared.preloadOffscreen = sender.on;
+    Settings.shared.preloadOffscreen = sender.on;
     [self updateUI];
 }
 
 - (IBAction)preloadInDetachedParentViewChanged:(UISwitch *)sender
 {
-    DataModel.shared.preloadInDetachedParentView = sender.on;
+    Settings.shared.preloadInDetachedParentView = sender.on;
     [self updateUI];
 }
 
 - (IBAction)waitForPreloadingCompletionEventChanged:(UISwitch *)sender
 {
-    DataModel.shared.waitForPreloadingCompletionEvent = sender.on;
+    Settings.shared.waitForPreloadingCompletionEvent = sender.on;
     [self updateUI];
 }
 
 - (IBAction)hideAfterPreloadingChanged:(UISwitch *)sender
 {
-    DataModel.shared.hideAfterPreloading = sender.on;
+    Settings.shared.hideAfterPreloading = sender.on;
     [self updateUI];
 }
 
 - (IBAction)removeFromParentAfterPreloadingChanged:(UISwitch *)sender
 {
-    DataModel.shared.removeFromParentAfterPreloading = sender.on;
+    Settings.shared.removeFromParentAfterPreloading = sender.on;
     [self updateUI];
 }
 
 - (IBAction)injectVisibilityJavascriptSwitchChanged:(UISwitch *)sender
 {
-    DataModel.shared.injectVisibilityJavascript = sender.on;
+    Settings.shared.injectVisibilityJavascript = sender.on;
     [self updateUI];
 }
 
 - (IBAction)autoPresentSwitchChanged:(UISwitch *)sender
 {
-    DataModel.shared.shouldAutoPresent = sender.on;
+    Settings.shared.autoPresent = sender.on;
     [self updateUI];
 }
 
 - (IBAction)manualImpressionsSwitchChanged:(UISwitch *)sender
 {
-    DataModel.shared.manualImpressions = sender.on;
+    Settings.shared.manualImpressions = sender.on;
     [self updateUI];
 }
 
