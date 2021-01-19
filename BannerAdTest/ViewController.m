@@ -173,9 +173,10 @@
     
     // Create the request.
     DFPRequest *request = [DFPRequest request];
-    request.testDevices = @[kGADSimulatorID];
     
-    // Create the loader.
+    // Test mode
+    GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = @[kGADSimulatorID];
+    
     self.loader = [[GADAdLoader alloc] initWithAdUnitID:unitID rootViewController:self adTypes:adTypes options:nil];
     self.loader.delegate = self;
     
