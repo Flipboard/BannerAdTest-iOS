@@ -98,7 +98,7 @@ NSString *const kFLMRAIDAdPageDidLoad = @"FLMRAIDAdDidLoadPage";
         WKUserContentController *userContentController = [[WKUserContentController alloc] init];
         config.userContentController = userContentController;
         config.allowsInlineMediaPlayback = YES;
-        config.mediaPlaybackRequiresUserAction = NO;
+        config.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeNone;
         
         self.webView = [[WKWebView alloc] initWithFrame:self.bounds configuration:config];
         self.webView.navigationDelegate = self;
