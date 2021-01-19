@@ -471,13 +471,7 @@
     NSString *javascriptString = [self bannerVisibilityJavascriptString:visible];
     
     UIView *webView = [self topmostWebView:self.bannerView];
-    
-    if ([webView isKindOfClass:[UIWebView class]]) {
-        [(UIWebView *)webView stringByEvaluatingJavaScriptFromString:javascriptString];
-    }
-    else if ([webView isKindOfClass:[WKWebView class]]) {
-        [(WKWebView *)webView evaluateJavaScript:javascriptString completionHandler:nil];
-    }
+    [(WKWebView *)webView evaluateJavaScript:javascriptString completionHandler:nil];
 }
 
 - (UIView *)topmostWebView:(UIView *)rootView
@@ -487,7 +481,7 @@
         return nil;
     }
     
-    // This is a breadth first search, so maintain a queue of views to check.
+    // This is a breadth first search so maintain a queue of views to check.
     NSArray<UIView *> *views = @[rootView];
     
     // Subviews to check on the next iteration.
@@ -497,8 +491,8 @@
     while (views.count > 0) {
         // Iterate over them.
         for (UIView *view in views) {
-            // If the view is a UIWebView or a WKWebView, return it.
-            if ([view isKindOfClass:[UIWebView class]] || [view isKindOfClass:[WKWebView class]]) {
+            // If the view is a WKWebView, return it.
+            if ([view isKindOfClass:[WKWebView class]]) {
                 return view;
             }
             // Otherwise, enqueue the view's subviews.
