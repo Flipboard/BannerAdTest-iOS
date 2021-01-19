@@ -12,18 +12,18 @@
 
 // Google Ads
 @property (nonatomic, strong) GADAdLoader *loader;
-@property (nonatomic, strong) DFPBannerView *bannerView;
 
-// Flipboard Ads
+// Ad views
+@property (nonatomic, strong) DFPBannerView *bannerView;
 @property (nonatomic, strong) FLMRAIDWebContainerView *customMRAIDView;
 
 // Layout
-@property (nonatomic, assign) BOOL bannerWantsFullscreen;
+@property (nonatomic, assign) BOOL adWantsFullscreen;
 @property (nonatomic, strong) UIView *detachedParentView;
 
 // Timing
-@property (nonatomic, assign) BOOL bannerIsPreloading;
-@property (nonatomic, assign) BOOL bannerHasBeenPreloaded;
+@property (nonatomic, assign) BOOL adIsPreloading;
+@property (nonatomic, assign) BOOL adIsFinishedPreloading;
 
 // Debug UI
 @property (nonatomic, weak) IBOutlet UIActivityIndicatorView *spinner;
@@ -85,7 +85,7 @@
         self.activityLabel.text = @"Preloading";
     }
     // Ready
-    else if ([self canPresentBanner]) {
+    else if ([self canPresentAd]) {
         [self.spinner stopAnimating];
         self.spinner.hidden = YES;
         self.activityLabel.text = @"Ready";
@@ -103,7 +103,7 @@
         self.actionBarButton.enabled = YES;
     }
     // Present button
-    else if ([self canPresentBanner]) {
+    else if ([self canPresentAd]) {
         self.actionBarButton.title = @"Present";
         self.actionBarButton.enabled = YES;
     }
@@ -125,8 +125,8 @@
         [self tryFetchAd];
     }
     // Present
-    else if ([self canPresentBanner]) {
-        [self layoutBannerView];
+    else if ([self canPresentAd]) {
+        [self layoutAdView];
     }
     
     // Update the UI.
@@ -143,12 +143,12 @@
     self.loader = nil;
     
     // Destroy the banner
-    [self destroyBannerView];
+    [self destroyAdView];
     
     // Reset flags
-    self.bannerWantsFullscreen = NO;
-    self.bannerIsPreloading = NO;
-    self.bannerHasBeenPreloaded = NO;
+    self.adWantsFullscreen = NO;
+    self.adIsPreloading = NO;
+    self.adIsFinishedPreloading = NO;
     
     // Update the UI
     [self updateUI];
@@ -165,22 +165,23 @@
     
     NSLog(@"$$$$$ Fetching ad");
     
-    // Unit ID.
+    // Unit ID
     NSString *unitID = Settings.shared.unitID;
     
-    // Banner and native types (unified request).
+    // Banner and native types (unified request)
     NSArray *adTypes = @[kGADAdLoaderAdTypeDFPBanner, kGADAdLoaderAdTypeUnifiedNative];
     
-    // Create the request.
+    // Create the request
     DFPRequest *request = [DFPRequest request];
     
     // Test mode
     GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = @[kGADSimulatorID];
     
+    // Create the loader
     self.loader = [[GADAdLoader alloc] initWithAdUnitID:unitID rootViewController:self adTypes:adTypes options:nil];
     self.loader.delegate = self;
     
-    // Load the request.
+    // Load the request
     [self.loader loadRequest:request];
 }
 
@@ -189,8 +190,8 @@
     NSLog(@"$$$$$ Loading/preloading finished");
     
     // Update state
-    self.bannerIsPreloading = NO;
-    self.bannerHasBeenPreloaded = YES;
+    self.adIsPreloading = NO;
+    self.adIsFinishedPreloading = YES;
     
     // Hide after preloading?
     if (Settings.shared.hideAfterPreloading) {
@@ -207,7 +208,7 @@
     // Auto-present?
     if (Settings.shared.autoPresent) {
         // Layout
-        [self layoutBannerView];
+        [self layoutAdView];
     }
     
     // Update the UI
@@ -241,7 +242,7 @@
     
     // If the banner is 1x1 it's fullscreen.
     // This is a convention suggested by Google.
-    self.bannerWantsFullscreen = CGSizeEqualToSize(self.bannerView.frame.size, CGSizeMake(1.0, 1.0));
+    self.adWantsFullscreen = CGSizeEqualToSize(self.bannerView.frame.size, CGSizeMake(1.0, 1.0));
     
     // Register as the banner's event delegate.
     self.bannerView.appEventDelegate = self;
@@ -289,7 +290,7 @@
     
     // Resize
     // IMPORTANT: Do this as early as possible.  Banners won't load properly when they're 1x1.
-    [self resizeBannerView];
+    [self resizeAdView];
     
     // PRELOADING HACK
     // Banners won't preload unless they're attached to a window.
@@ -318,7 +319,7 @@
         }
         
         // Track the state.
-        self.bannerIsPreloading = YES;
+        self.adIsPreloading = YES;
         
         // Preload for a constant amount of time if we're not waiting for a completion event.
         if (Settings.shared.preload && !Settings.shared.waitForPreloadingCompletionEvent) {
@@ -390,12 +391,12 @@
     return fullscreenFrame;
 }
 
-- (void)resizeBannerView
+- (void)resizeAdView
 {
-    NSLog(@"$$$$$ resizeBannerView");
+    NSLog(@"$$$$$ resizeAdView");
     
     // Fullscreen size if the ad wants it.
-    if (self.bannerWantsFullscreen) {
+    if (self.adWantsFullscreen) {
         // Google resize method
         NSLog(@"$$$$$ Expanding banner to fullscreen frame");
         [self.bannerView resize:GADAdSizeFromCGSize(self.fullscreenFrame.size)];
@@ -405,18 +406,18 @@
     }
 }
 
-- (void)layoutBannerView
+- (void)layoutAdView
 {
-    NSLog(@"$$$$$ layoutBannerView");
+    NSLog(@"$$$$$ layoutAdView");
     
     // Add the banner as a subview if necessary.
-    if (![self hasBannerSubview]) {
+    if (![self hasAdSubview]) {
         NSLog(@"$$$$$ Adding banner view as subview");
         [self.view addSubview:self.bannerView];
     }
     
     // Fullscreen banners take up most of the screen.
-    if (self.bannerWantsFullscreen) {
+    if (self.adWantsFullscreen) {
         NSLog(@"$$$$$ Expanding banner to fullscreen frame");
         self.bannerView.frame = self.fullscreenFrame;
     }
@@ -447,20 +448,22 @@
     [self updateUI];
 }
 
-- (void)destroyBannerView
+- (void)destroyAdView
 {
     if (self.bannerView) {
-        NSLog(@"$$$$$ Destroying banner");
+        NSLog(@"$$$$$ Destroying ad view");
     
         [self.bannerView removeFromSuperview];
         self.bannerView = nil;
     }
 }
 
-- (BOOL)hasBannerSubview
+- (BOOL)hasAdSubview
 {
     return [self.view.subviews containsObject:self.bannerView];
 }
+
+#pragma mark - Javascript Injection
 
 - (void)setBannerVisibilityJavascriptFlagToYes
 {
@@ -471,11 +474,11 @@
 {
     NSString *javascriptString = [self bannerVisibilityJavascriptString:visible];
     
-    UIView *webView = [self topmostWebView:self.bannerView];
+    UIView *webView = [self firstWKWebViewSubview:self.bannerView];
     [(WKWebView *)webView evaluateJavaScript:javascriptString completionHandler:nil];
 }
 
-- (UIView *)topmostWebView:(UIView *)rootView
+- (UIView *)firstWKWebViewSubview:(UIView *)rootView
 {
     // Be safe.
     if (rootView == nil) {
@@ -537,12 +540,12 @@
 
 - (BOOL)isPreloadingAd
 {
-    return self.bannerIsPreloading;
+    return self.adIsPreloading;
 }
 
-- (BOOL)canPresentBanner
+- (BOOL)canPresentAd
 {
-    return self.bannerView != nil && ![self hasBannerSubview] && ![self isPreloadingAd] && !Settings.shared.autoPresent;
+    return self.bannerView != nil && ![self hasAdSubview] && ![self isPreloadingAd] && !Settings.shared.autoPresent;
 }
 
 @end
