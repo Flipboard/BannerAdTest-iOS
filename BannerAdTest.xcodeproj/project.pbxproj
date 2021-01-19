@@ -15,6 +15,8 @@
 		52B6C4E42253493C0055B764 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 52B6C4E32253493C0055B764 /* SettingsViewController.m */; };
 		52B6C4E722534E1F0055B764 /* UnitIDViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 52B6C4E622534E1F0055B764 /* UnitIDViewController.m */; };
 		52B6C4EA225359640055B764 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 52B6C4E9225359640055B764 /* Settings.m */; };
+		52F5F6BA25B6BA6000571FAE /* FLMRAIDWebContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 52F5F6B925B6BA6000571FAE /* FLMRAIDWebContainerView.m */; };
+		52F5F6BD25B6BA8400571FAE /* mraid.js in Resources */ = {isa = PBXBuildFile; fileRef = 52F5F6BC25B6BA8400571FAE /* mraid.js */; };
 		5F2DE6D7C4F30B74BB47ECBF /* libPods-BannerAdTest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DD9EF14B6E7CF50A0D052FC /* libPods-BannerAdTest.a */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +37,9 @@
 		52B6C4E622534E1F0055B764 /* UnitIDViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UnitIDViewController.m; sourceTree = "<group>"; };
 		52B6C4E8225359640055B764 /* Settings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
 		52B6C4E9225359640055B764 /* Settings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
+		52F5F6B525B6BA3300571FAE /* FLMRAIDWebContainerView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FLMRAIDWebContainerView.h; sourceTree = "<group>"; };
+		52F5F6B925B6BA6000571FAE /* FLMRAIDWebContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLMRAIDWebContainerView.m; sourceTree = "<group>"; };
+		52F5F6BC25B6BA8400571FAE /* mraid.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = mraid.js; sourceTree = "<group>"; };
 		B2CF70A79E61704AB8D13140 /* Pods-BannerAdTest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BannerAdTest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BannerAdTest/Pods-BannerAdTest.debug.xcconfig"; sourceTree = "<group>"; };
 		CF12E27E19A6C783001EB38A /* BannerAdTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BannerAdTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -80,6 +85,16 @@
 			path = BannerAdTest;
 			sourceTree = "<group>";
 		};
+		52F5F6AD25B6B93700571FAE /* Flipboard MRAID */ = {
+			isa = PBXGroup;
+			children = (
+				52F5F6B525B6BA3300571FAE /* FLMRAIDWebContainerView.h */,
+				52F5F6B925B6BA6000571FAE /* FLMRAIDWebContainerView.m */,
+				52F5F6BC25B6BA8400571FAE /* mraid.js */,
+			);
+			path = "Flipboard MRAID";
+			sourceTree = "<group>";
+		};
 		A8553937408B1BCA9C95370B /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -93,6 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				50931E5A2151A9C60031BE3E /* BannerAdTest */,
+				52F5F6AD25B6B93700571FAE /* Flipboard MRAID */,
 				CF12E27F19A6C783001EB38A /* Products */,
 				40184701FE974B8C46EF51AF /* Frameworks */,
 				A8553937408B1BCA9C95370B /* Pods */,
@@ -169,6 +185,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				50931E652151A9C60031BE3E /* Main.storyboard in Resources */,
+				52F5F6BD25B6BA8400571FAE /* mraid.js in Resources */,
 				50931E662151A9C60031BE3E /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -207,6 +224,7 @@
 				52B6C4E722534E1F0055B764 /* UnitIDViewController.m in Sources */,
 				50931E642151A9C60031BE3E /* AppDelegate.m in Sources */,
 				52B6C4EA225359640055B764 /* Settings.m in Sources */,
+				52F5F6BA25B6BA6000571FAE /* FLMRAIDWebContainerView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
