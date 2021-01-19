@@ -6,12 +6,18 @@
 #import "SettingsViewController.h"
 #import "Settings.h"
 #import <WebKit/WebKit.h>
+#import "FLMRAIDWebContainerView.h"
 
 @interface ViewController () <DFPBannerAdLoaderDelegate, GADUnifiedNativeAdLoaderDelegate, GADAppEventDelegate>
 
-// Ads
+// Google Ads
 @property (nonatomic, strong) GADAdLoader *loader;
 @property (nonatomic, strong) DFPBannerView *bannerView;
+
+// Flipboard Ads
+@property (nonatomic, strong) FLMRAIDWebContainerView *customMRAIDView;
+
+// Layout
 @property (nonatomic, assign) BOOL bannerWantsFullscreen;
 @property (nonatomic, strong) UIView *detachedParentView;
 

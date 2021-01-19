@@ -8,6 +8,7 @@
 
 #import "Settings.h"
 
+static NSString *kFLContainerType = @"FLContainerType";
 static NSString *kFLUnitID = @"FLUnitID";
 static NSString *kFLPreload = @"FLPreload";
 static NSString *kFLPreloadOffscreen = @"FLPreloadOffscreen";
@@ -35,6 +36,9 @@ static NSString *kFLManualImpressions = @"FLManualImpressions";
 {
     self = [super init];
     if (self) {
+        // Container type
+        self.containerType = [self defaultIntegerForKey:kFLContainerType fallback:MRAIDContainerTypeDFPBannerView];
+        
         // Unit ID
         self.unitID = [self defaultStringForKey:kFLUnitID fallback:@"/21709104563/testing/celtra/celtra18"];
         
@@ -80,6 +84,13 @@ static NSString *kFLManualImpressions = @"FLManualImpressions";
 {
     id object = [self.defaults objectForKey:key];
     BOOL result = object ? [self.defaults boolForKey:key] : fallback;
+    return result;
+}
+
+- (BOOL)defaultIntegerForKey:(NSString *)key fallback:(NSInteger)fallback
+{
+    id object = [self.defaults objectForKey:key];
+    NSInteger result = object ? [self.defaults integerForKey:key] : fallback;
     return result;
 }
 
@@ -129,6 +140,12 @@ static NSString *kFLManualImpressions = @"FLManualImpressions";
 - (NSUserDefaults *)defaults
 {
     return [NSUserDefaults standardUserDefaults];
+}
+
+- (void)setContainerType:(MRAIDContainerType)containerType
+{
+    _containerType = containerType;
+    [self.defaults setObject:@(containerType) forKey:kFLContainerType];
 }
 
 - (NSString *)prettyUnitID
