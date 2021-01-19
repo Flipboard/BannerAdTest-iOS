@@ -133,7 +133,11 @@ static NSString *kFLManualImpressions = @"FLManualImpressions";
          @"/21709104563/testing/celtra/celtra18",
          
          // Video ad *with* javascript hack
-         @"/21709104563/testing/celtra/celtra20"
+         @"/21709104563/testing/celtra/celtra20",
+         
+         // Autoplay video Celtra ads (banner and custom template)
+         @"/21709104563/testing/celtra/celtra24",
+         @"/21709104563/testing/celtra/celtra25"
     ];
 }
 
