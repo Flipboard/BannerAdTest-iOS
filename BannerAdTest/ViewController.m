@@ -12,10 +12,12 @@
 
 // Google Ads
 @property (nonatomic, strong) GADAdLoader *loader;
+@property (nonatomic, strong) GADNativeCustomTemplateAd *customTemplateAd;
 
 // Ad views
-@property (nonatomic, strong) DFPBannerView *bannerView;
-@property (nonatomic, strong) FLMRAIDWebContainerView *customMRAIDView;
+@property (nonatomic, strong) UIView *currentAdView;
+@property (nonatomic, strong) DFPBannerView *googleBannerView;
+@property (nonatomic, strong) FLMRAIDWebContainerView *flipboardMRAIDView;
 
 // Layout
 @property (nonatomic, assign) BOOL adWantsFullscreen;
@@ -142,7 +144,7 @@
     // Destroy the loader
     self.loader = nil;
     
-    // Destroy the banner
+    // Destroy the ad view
     [self destroyAdView];
     
     // Reset flags
@@ -195,14 +197,14 @@
     
     // Hide after preloading?
     if (Settings.shared.hideAfterPreloading) {
-        NSLog(@"$$$$$ Hiding banner");
-        self.bannerView.hidden = YES;
+        NSLog(@"$$$$$ Hiding ad view");
+        self.currentAdView.hidden = YES;
     }
     
     // Remove from hierarchy after preloading?
     if (Settings.shared.removeFromParentAfterPreloading) {
-        NSLog(@"$$$$$ Removing banner from parent");
-        [self.bannerView removeFromSuperview];
+        NSLog(@"$$$$$ Removing ad view from parent");
+        [self.currentAdView removeFromSuperview];
     }
     
     // Auto-present?
@@ -232,27 +234,28 @@
 {
     NSLog(@"$$$$$ adLoader:didReceiveDFPBannerView:");
     
-    // Abandon the banner if the fetch has been cancelled.
+    // Abandon the ad if the fetch has been cancelled
     if (!self.loader) {
         return;
     }
     
-    // Grab the banner.
-    self.bannerView = bannerView;
+    // Grab the banner
+    self.googleBannerView = bannerView;
+    self.currentAdView = bannerView;
     
-    // If the banner is 1x1 it's fullscreen.
-    // This is a convention suggested by Google.
-    self.adWantsFullscreen = CGSizeEqualToSize(self.bannerView.frame.size, CGSizeMake(1.0, 1.0));
+    // If the banner is 1x1 it's fullscreen
+    // This is a convention suggested by Google
+    self.adWantsFullscreen = CGSizeEqualToSize(self.googleBannerView.frame.size, CGSizeMake(1.0, 1.0));
     
-    // Register as the banner's event delegate.
-    self.bannerView.appEventDelegate = self;
+    // Register as the banner's event delegate
+    self.googleBannerView.appEventDelegate = self;
     
-    // Register for manual impressions if desired.
+    // Register for manual impressions if desired
     if (Settings.shared.manualImpressions) {
-        self.bannerView.enableManualImpressions = YES;
+        self.googleBannerView.enableManualImpressions = YES;
     }
     
-    // Update the UI.
+    // Update the UI
     [self updateUI];
 }
 
@@ -260,9 +263,9 @@
 {
     NSLog(@"$$$$$ adLoader:didReceiveUnifiedNativeAd:");
     
-    // Do nothing because we're only testing banners.
+    // Do nothing because we don't support native ads in this test app yet
     
-    // Update the UI.
+    // Update the UI
     [self updateUI];
 }
 
@@ -271,7 +274,7 @@
     // Log the error
     NSLog(@"$$$$$ adLoader:didFailToReceiveAdWithError: %@", error);
     
-    // Update the UI.
+    // Update the UI
     [self updateUI];
 }
 
@@ -279,66 +282,66 @@
 {
     NSLog(@"$$$$$ adLoaderDidFinishLoading:");
     
-    // Abort if the fetch was cancelled or no banner arrived.
-    if (!self.loader || !self.bannerView) {
+    // Abort if the fetch was cancelled or no ad view arrived
+    if (!self.loader || !self.currentAdView) {
         [self reset];
         return;
     }
     
-    // Get rid of the loader.
+    // Get rid of the loader
     self.loader = nil;
     
     // Resize
-    // IMPORTANT: Do this as early as possible.  Banners won't load properly when they're 1x1.
+    // IMPORTANT: Do this as early as possible.  Ad views won't load properly when they're 1x1.
     [self resizeAdView];
     
     // PRELOADING HACK
-    // Banners won't preload unless they're attached to a window.
+    // Web views won't preload unless they're attached to a window
     if (Settings.shared.preload) {
         // Logging
         NSLog(@"$$$$$ Using preloading hack");
-        NSLog(@"$$$$$ Adding banner to main window");
+        NSLog(@"$$$$$ Adding ad view to main window");
         
-        // Two possible parent views for the preloading banner:
-        // 1. A view that isn't part of the hierarchy (suggested by Google).
-        // 2. The app's main window.
+        // Two possible parent views for the preloading ad view:
+        // 1. A view that isn't part of the hierarchy (suggested by Google)
+        // 2. The app's main window
         if (Settings.shared.preloadInDetachedParentView) {
-            // Add the banner to the detached view so it can preload.
-            [self.detachedParentView addSubview:self.bannerView];
+            // Add the ad view to the detached view so it can preload
+            [self.detachedParentView addSubview:self.currentAdView];
         } else {
-            // Add the banner to the main window so it can preload.
-            [self.mainWindow insertSubview:self.bannerView atIndex:0];
+            // Add the ad view to the main window so it can preload
+            [self.mainWindow insertSubview:self.currentAdView atIndex:0];
         }
         
-        // Optionally move the banner outside of the screen frame.
+        // Optionally move the ad view outside of the screen frame
         if (Settings.shared.preloadOffscreen) {
-            NSLog(@"$$$$$ Moving banner outside of screen bounds");
-            CGRect offscreenBannerFrame = self.bannerView.frame;
-            offscreenBannerFrame.origin.x += UIScreen.mainScreen.bounds.size.width;
-            self.bannerView.frame = offscreenBannerFrame;
+            NSLog(@"$$$$$ Moving ad view outside of screen bounds");
+            CGRect offscreenAdViewFrame = self.currentAdView.frame;
+            offscreenAdViewFrame.origin.x += UIScreen.mainScreen.bounds.size.width;
+            self.currentAdView.frame = offscreenAdViewFrame;
         }
         
-        // Track the state.
+        // Track the state
         self.adIsPreloading = YES;
         
-        // Preload for a constant amount of time if we're not waiting for a completion event.
+        // Preload for a constant amount of time if we're not waiting for a completion event
         if (Settings.shared.preload && !Settings.shared.waitForPreloadingCompletionEvent) {
-            // Wait a specified amount of time for preloading to complete.
+            // Wait a specified amount of time for preloading to complete
             NSTimeInterval kPreloadingTime = 5.0;
             [self performSelector:@selector(loadingAndPreloadingDidFinish) withObject:nil afterDelay:kPreloadingTime];
         }
     }
     // NO PRELOADING HACK
-    // Show banner immediately after it's received.
+    // Show ad view immediately after it's received
     else {
         // Logging
         NSLog(@"$$$$$ Not using preloading hack");
         
-        // Skip preloading.
+        // Skip preloading
         [self loadingAndPreloadingDidFinish];
     }
     
-    // Update the UI.
+    // Update the UI
     [self updateUI];
 }
 
@@ -367,7 +370,7 @@
         _detachedParentView = [[UIView alloc] init];
         _detachedParentView.frame = UIScreen.mainScreen.bounds;
         
-        // Intentionally don't add to the view hierarchy.
+        // Intentionally don't add to the view hierarchy
     }
     return _detachedParentView;
 }
@@ -395,14 +398,17 @@
 {
     NSLog(@"$$$$$ resizeAdView");
     
-    // Fullscreen size if the ad wants it.
+    // Fullscreen size if the ad wants it
     if (self.adWantsFullscreen) {
-        // Google resize method
-        NSLog(@"$$$$$ Expanding banner to fullscreen frame");
-        [self.bannerView resize:GADAdSizeFromCGSize(self.fullscreenFrame.size)];
+        // Google banner views must call the resize method before setting the frame
+        if (self.googleBannerView) {
+            NSLog(@"$$$$$ DFPBannerView resize method for fullscreen");
+            [self.googleBannerView resize:GADAdSizeFromCGSize(self.fullscreenFrame.size)];
+        }
         
-        //
-        self.bannerView.frame = self.fullscreenFrame;
+        // Set the ad view's frame
+        NSLog(@"$$$$$ Setting ad view frame to fullscreen");
+        self.currentAdView.frame = self.fullscreenFrame;
     }
 }
 
@@ -410,38 +416,39 @@
 {
     NSLog(@"$$$$$ layoutAdView");
     
-    // Add the banner as a subview if necessary.
+    // Add the ad view as a subview if necessary
     if (![self hasAdSubview]) {
-        NSLog(@"$$$$$ Adding banner view as subview");
-        [self.view addSubview:self.bannerView];
+        NSLog(@"$$$$$ Adding ad view as subview");
+        [self.view addSubview:self.currentAdView];
     }
     
-    // Fullscreen banners take up most of the screen.
+    // Fullscreen ads take up most of the screen
     if (self.adWantsFullscreen) {
-        NSLog(@"$$$$$ Expanding banner to fullscreen frame");
-        self.bannerView.frame = self.fullscreenFrame;
+        NSLog(@"$$$$$ Expanding ad view to fullscreen frame");
+        self.currentAdView.frame = self.fullscreenFrame;
     }
-    // Non-fullscreen banners are centered, but not resized.
+    // Non-fullscreen ads are centered, but not resized
     else {
-        NSLog(@"$$$$$ Centering banner");
-        self.bannerView.center = self.view.center;
+        NSLog(@"$$$$$ Centering ad view");
+        self.currentAdView.center = self.view.center;
     }
     
-    // Show the banner in case it was hidden.
-    self.bannerView.hidden = NO;
+    // Show the ad view in case it was hidden
+    self.currentAdView.hidden = NO;
     
     // The GMA SDK seems to think ads are visibile when they're not.
-    // To work around this, inject javascript to tell the banner that it's *actually* visible.
+    // To work around this, inject javascript to tell the ad view that it's *actually* visible.
     // Wait until the next runloop to avoid timing issues.
     if (Settings.shared.injectVisibilityJavascript) {
         NSLog(@"$$$$$ Injecting banner visibility javascript");
-        [self performSelector:@selector(setBannerVisibilityJavascriptFlagToYes) withObject:nil afterDelay:0.0];
+        [self performSelector:@selector(setAdViewVisibilityJavascriptFlagToYes) withObject:nil afterDelay:0.0];
     }
     
-    // Manual impressions if desired.
+    // Manual impressions if desired
     if (Settings.shared.manualImpressions) {
         NSLog(@"$$$$$ Firing manual impression");
-        [self.bannerView recordImpression];
+        [self.googleBannerView recordImpression]; // Google banner
+        [self.customTemplateAd recordImpression]; // Flipboard MRAID
     }
     
     // Update the UI.
@@ -450,35 +457,45 @@
 
 - (void)destroyAdView
 {
-    if (self.bannerView) {
-        NSLog(@"$$$$$ Destroying ad view");
-    
-        [self.bannerView removeFromSuperview];
-        self.bannerView = nil;
+    // Google banner
+    if (self.googleBannerView) {
+        NSLog(@"$$$$$ Destroying google banner view");
+        [self.googleBannerView removeFromSuperview];
+        self.googleBannerView = nil;
     }
+    
+    // Flipboard MRAID
+    if (self.flipboardMRAIDView) {
+        NSLog(@"$$$$$ Destroying flipboard mraid view");
+        [self.flipboardMRAIDView removeFromSuperview];
+        self.flipboardMRAIDView = nil;
+    }
+    
+    // Clear current ad view
+    self.currentAdView = nil;
 }
 
 - (BOOL)hasAdSubview
 {
-    return [self.view.subviews containsObject:self.bannerView];
+    return [self.view.subviews containsObject:self.currentAdView];
 }
 
 #pragma mark - Javascript Injection
 
-- (void)setBannerVisibilityJavascriptFlagToYes
+- (void)setAdViewVisibilityJavascriptFlagToYes
 {
-    [self setBannerVisibilityJavascriptFlag:YES];
+    [self setAdViewVisibilityJavascriptFlag:YES];
 }
 
- - (void)setBannerVisibilityJavascriptFlag:(BOOL)visible
+ - (void)setAdViewVisibilityJavascriptFlag:(BOOL)visible
 {
-    NSString *javascriptString = [self bannerVisibilityJavascriptString:visible];
+    NSString *javascriptString = [self adViewVisibilityJavascriptString:visible];
     
-    UIView *webView = [self firstWKWebViewSubview:self.bannerView];
+    UIView *webView = [self firstWebViewInView:self.currentAdView];
     [(WKWebView *)webView evaluateJavaScript:javascriptString completionHandler:nil];
 }
 
-- (UIView *)firstWKWebViewSubview:(UIView *)rootView
+- (UIView *)firstWebViewInView:(UIView *)rootView
 {
     // Be safe.
     if (rootView == nil) {
@@ -514,7 +531,7 @@
     return nil;
 }
 
-- (NSString *)bannerVisibilityJavascriptString:(BOOL)visible
+- (NSString *)adViewVisibilityJavascriptString:(BOOL)visible
 {
     NSString *param = visible ? @"true" : @"false";
     NSString *javascriptString = [NSString stringWithFormat:@"if (typeof setFlipboardAdIsVisible === 'function') { setFlipboardAdIsVisible(%@); }", param];
@@ -525,17 +542,17 @@
 
 - (BOOL)canReset
 {
-    return self.loader != nil || self.bannerView != nil;
+    return self.loader != nil || self.currentAdView != nil;
 }
 
 - (BOOL)canFetchAd
 {
-    return self.loader == nil && self.bannerView == nil;
+    return self.loader == nil && self.currentAdView == nil;
 }
 
 - (BOOL)isFetchingAd
 {
-    return self.loader != nil && self.bannerView == nil;
+    return self.loader != nil && self.currentAdView == nil;
 }
 
 - (BOOL)isPreloadingAd
@@ -545,7 +562,7 @@
 
 - (BOOL)canPresentAd
 {
-    return self.bannerView != nil && ![self hasAdSubview] && ![self isPreloadingAd] && !Settings.shared.autoPresent;
+    return self.currentAdView != nil && ![self hasAdSubview] && ![self isPreloadingAd] && !Settings.shared.autoPresent;
 }
 
 @end
