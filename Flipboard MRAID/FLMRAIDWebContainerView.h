@@ -6,6 +6,10 @@
 //  Copyright © 2018 Flipboard. All rights reserved.
 //
 
+@import UIKit;
+
+typedef void (^FLVoidBlock)(void);
+
 typedef NS_ENUM(NSUInteger, FLMRAIDState) {
     FLMRAIDStateLoading,
     FLMRAIDStateFailedToLoad,
@@ -13,27 +17,24 @@ typedef NS_ENUM(NSUInteger, FLMRAIDState) {
     FLMRAIDStateExpanded
 };
 
-@class FLMRAIDItem;
+extern NSString *const kFLMRAIDAdPageDidLoad;
+
 @protocol FLMRAIDWebContainerViewDelegate;
 
-@interface FLMRAIDWebContainerView : FLView
+@interface FLMRAIDWebContainerView : UIView
 
-@property (nonatomic, strong) FLMRAIDItem *item;
+@property (nonatomic, strong) NSString *adHTMLString;
 @property (nonatomic, assign, readonly) FLMRAIDState state;
 @property (nonatomic, weak) NSObject<FLMRAIDWebContainerViewDelegate> *delegate;
 
 // Manual control of viewability changes in a scrolling context
 @property (nonatomic, assign, getter=isViewableOverride) BOOL viewableOverride;
 
-// Disable web scrollview gesture correction (defaults to YES)
-@property (nonatomic, assign) BOOL disableWebGestureCorrection;
-
 // Expanded state support
 @property (nonatomic, copy) FLVoidBlock onExpand;
 @property (nonatomic, copy) FLVoidBlock onCloseExpandedState;
 - (BOOL)shouldShowExpandedStateCustomCloseButton;
 - (void)closeExpandedState;
-- (void)tryUpdateOMSDKSessionViewability;
 
 // Preload support
 @property (nonatomic, readonly) BOOL isLoaded;

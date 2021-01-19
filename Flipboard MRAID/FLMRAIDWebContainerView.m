@@ -7,27 +7,14 @@
 //
 
 #import "FLMRAIDWebContainerView.h"
-#import "FLMRAIDItem.h"
-#import "FLMRAIDCache.h"
-#import "FLAdManager.h"
-#import "OMIDScriptInjector.h"
-#import "OMIDAdEvents.h"
-#import "FLWebGestureCorrectingScrollView.h"
-#import "FLAdLogger.h"
 #import <WebKit/WebKit.h>
 
-//
-// Inspired heavily by Android's implementation (thanks, Irene!)
-// https://github.com/Flipboard/android/blob/master/libs/mraid/src/main/java/flipboard/mraid/MraidView.kt
-//
+NSString *const kFLMRAIDScriptInclude = @"mraid.js";
+NSString *const kFLMRAIDAdPageDidLoad = @"FLMRAIDAdDidLoadPage";
 
 @interface FLMRAIDWebContainerView () <WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate>
 
-// Views
-@property (nonatomic, strong) FLWebGestureCorrectingScrollView *webGestureScrollView;
 @property (nonatomic, strong) WKWebView *webView;
-
-// State
 @property (nonatomic, assign, readwrite) FLMRAIDState state;
 @property (nonatomic, strong) NSMutableArray *webViewScriptMessageQueue;
 @property (nonatomic, assign) BOOL didSetPageReady;
@@ -37,6 +24,24 @@
 @end
 
 @implementation FLMRAIDWebContainerView
+
+- (NSString *)adHTMLString
+{
+    // CJC: revisit
+    return @"";
+}
+
+- (CGFloat)adWidth
+{
+    // CJC: revisit
+    return UIScreen.mainScreen.bounds.size.width;
+}
+
+- (CGFloat)adHeight
+{
+    // CJC: revisit
+    return UIScreen.mainScreen.bounds.size.height;
+}
 
 - (void)setState:(FLMRAIDState)state
 {
@@ -51,7 +56,6 @@
     if (_viewable != viewable) {
         _viewable = viewable;
         [self fireViewableChangeEventInWebview:[self isViewable]];
-        [self tryUpdateOMSDKSessionViewability];
     }
 }
 
@@ -60,28 +64,6 @@
     if (_viewableOverride != viewableOverride) {
         _viewableOverride = viewableOverride;
         [self fireViewableChangeEventInWebview:_viewableOverride];
-    }
-}
-
-- (FLAd *)ad
-{
-    return self.item.adItem;
-}
-
-- (FLWebGestureCorrectingScrollView *)webGestureScrollView
-{
-    if (!_webGestureScrollView) {
-        _webGestureScrollView = [[FLWebGestureCorrectingScrollView alloc] init];
-        [self addSubview:_webGestureScrollView];
-    }
-    return _webGestureScrollView;
-}
-
-- (void)setDisableWebGestureCorrection:(BOOL)disableWebGestureCorrection
-{
-    if (_disableWebGestureCorrection != disableWebGestureCorrection) {
-        _disableWebGestureCorrection = disableWebGestureCorrection;
-        [self setNeedsLayout];
     }
 }
 
@@ -96,7 +78,8 @@
 - (BOOL)isPreloading
 {
     // FLMRAIDCache attaches preloading views as a direct child of UIAppMainWindow.
-    BOOL isPreloading = (self.superview == UIAppMainWindow);
+    UIWindow *mainWindow = UIApplication.sharedApplication.delegate.window;
+    BOOL isPreloading = (self.superview == mainWindow);
     return isPreloading;
 }
 
@@ -107,7 +90,7 @@
     
     // Only if there's valid HTML
     if (shouldPreload) {
-        shouldPreload = self.item.htmlString.length > 0;
+        shouldPreload = self.adHTMLString.length > 0;
     }
     
     if (shouldPreload) {
@@ -125,23 +108,10 @@
         self.webView.opaque = YES;
         self.webView.backgroundColor = [self loadingBackgroundColor];
         [self addWebViewScriptHandler];
-        [self.webGestureScrollView addSubview:self.webView];
+        [self addSubview:self.webView];
         
         // Hide webview until page load so we can fade it in.
         self.webView.alpha = 0.0;
-        
-        // We need to fake the user agent to look the same as if we hit the url from a web view.
-        // This is used by ad companies for anti-fraud.
-        NSString *nativeAdUserAgent = [FLPrefs nativeAdUserAgent];
-        if (nativeAdUserAgent.length > 0) {
-            self.webView.customUserAgent = nativeAdUserAgent;
-        }
-
-        // Turn off content adjustment for non-fullscreen ads as they may scroll under status bar
-        BOOL shouldDisableContentAdjustment = !self.item.prefersFullScreen;
-        if (shouldDisableContentAdjustment) {
-            self.webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-        }
         
         // Start loading MRAID HTML
         NSString *html = [self htmlToLoad];
@@ -154,8 +124,8 @@
 {
     // Inject some reset styles with our loading background color, and ad size.
     static NSString *const kFLMRAIDWrapperCSSFormat = @"<style>html, body { margin: 0; padding: 0; background: #%@; width: %fpx; height: %fpx; }</style>";
-    NSString *backgroundColorHex = [[self loadingBackgroundColor] hexStringFromColorIncludingAlpha:NO];
-    NSString *css = [NSString stringWithFormat:kFLMRAIDWrapperCSSFormat, backgroundColorHex, self.item.size.width, self.item.size.height];
+    NSString *backgroundColorHex = @"000000";
+    NSString *css = [NSString stringWithFormat:kFLMRAIDWrapperCSSFormat, backgroundColorHex, self.adWidth, self.adHeight];
     return css;
 }
 
@@ -164,7 +134,7 @@
     // Not all ads include mraid.js, even though they use the mraid APIs.
     // Avoid double-including mraid.js by checking for its existence in the ad.
     NSString *scriptTag = @"";
-    BOOL shouldIncludeMRAID = ![self.item.htmlString containsSubstring:kFLMRAIDScriptInclude];
+    BOOL shouldIncludeMRAID = [self.adHTMLString rangeOfString:kFLMRAIDScriptInclude].location == NSNotFound;
     if (shouldIncludeMRAID) {
         scriptTag = [NSString stringWithFormat:@"<script src='%@'></script>", kFLMRAIDScriptInclude];
     }
@@ -177,14 +147,7 @@
     static NSString *const kFLMRAIDWrapperHTMLFormat = @"<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width, user-scalable=0' />%@%@</head><body><div id='root'>%@</div></body></html>";
     NSString *css = [self cssToLoad];
     NSString *scriptTag = [self scriptTagToLoad];
-    NSString *html = [NSString stringWithFormat:kFLMRAIDWrapperHTMLFormat, css, scriptTag, self.item.htmlString];
-    
-    // Insert omsdk.js script
-    // Keep this at the bottom of this function to avoid tampering as the script needs to be at the top, which the OMIDScriptInjector handles itself
-    if (self.ad.isOpenSDKPreembedded) {
-        NSString *omsdkJSScript = [[FLAdManager defaultManager] openSDKJSLibraryScript];
-        html = [OMIDflipboardScriptInjector injectScriptContent:omsdkJSScript intoHTML:html error:nil];
-    }
+    NSString *html = [NSString stringWithFormat:kFLMRAIDWrapperHTMLFormat, css, scriptTag, self.adHTMLString];
     
     return html;
 }
@@ -193,14 +156,7 @@
 
 - (UIColor *)loadingBackgroundColor
 {
-    // Default to loading image background color
-    UIColor *loadingColor = [UIColor loadingImageBackgroundColor];
-    
-    // Fullscreen ads go dark
-    if (self.item.prefersFullScreen) {
-        loadingColor = [UIColor trueBlackColor_40];
-    }
-    return loadingColor;
+    return [UIColor blackColor];
 }
 
 - (void)layoutSubviews
@@ -211,11 +167,7 @@
     self.backgroundColor = [self loadingBackgroundColor];
     
     // Web view
-    self.webGestureScrollView.frame = self.bounds;
-    self.webView.frame = self.webGestureScrollView.bounds;
-    
-    // Disable web scroll view correction if needed
-    self.webGestureScrollView.scrollEnabled = !self.disableWebGestureCorrection;
+    self.webView.frame = self.bounds;
 }
 
 - (void)didMoveToWindow
@@ -338,7 +290,9 @@ static NSString *const kFLMScriptHandlerName = @"FlipboardMRAIDBridge";
     }
     
     // Queue it up
-    [self.webViewScriptMessageQueue addObjectOrNil:script];
+    if (script) {
+        [self.webViewScriptMessageQueue addObject:script];
+    }
 }
 
 - (void)tryFlushWebViewScriptMessages
@@ -349,7 +303,9 @@ static NSString *const kFLMScriptHandlerName = @"FlipboardMRAIDBridge";
         NSString *message = [self.webViewScriptMessageQueue firstObject];
         [self evaluateJavaScript:message completionHandler:^(id result, NSError * _Nullable error) {
             // Shift the front of the queue, and flush next or stop
-            [weakSelf.webViewScriptMessageQueue fl_safeRemoveFirstObject];
+            if (weakSelf.webViewScriptMessageQueue.count > 0) {
+                [weakSelf.webViewScriptMessageQueue removeObjectAtIndex:0];
+            }
             if (weakSelf.webViewScriptMessageQueue.count > 0) {
                 [weakSelf tryFlushWebViewScriptMessages];
             } else {
@@ -372,7 +328,7 @@ static NSString *const kFLMScriptHandlerName = @"FlipboardMRAIDBridge";
 
 - (void)setLogLevelInWebview
 {
-    NSString *logLevel = [FLPrefs isInternalTesting] ? @"DEBUG" : @"ERROR";
+    NSString *logLevel = @"DEBUG";
     NSString *script = [NSString stringWithFormat:@"mraid.logLevel = mraid.LogLevelEnum.%@", logLevel];
     [self evaluateJavaScript:script completionHandler:nil];
 }
@@ -431,23 +387,6 @@ static NSString *const kFLMScriptHandlerName = @"FlipboardMRAIDBridge";
     [self evaluateJavaScript:script completionHandler:nil];
 }
 
-- (void)tryUpdateOMSDKSessionViewability
-{
-    // If ad has loaded and is viewable, setup session and log impression
-    if ([self isViewable] && [self isLoaded]) {
-        // Set up our own OM.
-        [[FLAdManager defaultManager] tryCreateViewabilityTrackerForMRAIDAd:self.ad withDisplayingView:self];
-        [self.ad.openSDKAdEvents impressionOccurredWithError:nil];
-        
-        // Also set up Google's OM.
-        [self.ad tryStartGoogleOMSDKSessionWithView:self.webView];
-    }
-    // Otherwise if we're not expanded and the ad isn't viewable, destroy the session as it means we've moved away from the ad
-    else if (![self isViewable] && self.state != FLMRAIDStateExpanded) {
-        [[FLAdManager defaultManager] tryDestroyViewabilityTrackerForAd:self.ad inFeed:nil];
-    }
-}
-
 #pragma mark - Helpers
 
 - (CGRect)frameInWindowCoords
@@ -501,7 +440,7 @@ static NSString *const kFLMScriptHandlerName = @"FlipboardMRAIDBridge";
     
     // Only if we've been laid out (so frames can be set)
     if (shouldSet) {
-        shouldSet = self.frameWidth > 0.0;
+        shouldSet = self.frame.size.width > 0.0;
     }
     
     if (shouldSet) {
@@ -523,21 +462,11 @@ static NSString *const kFLMScriptHandlerName = @"FlipboardMRAIDBridge";
 
 - (void)openURL:(NSURL *)url
 {
-    // Log a click
-    [[FLAdManager defaultManager] tryLogClickForAdWithValueString:self.item.clickValueString clickTrackingURLStrings:self.ad.clickTrackingURLStrings];
-    
-    // Open URL
-    [FLSwitchboard openURLInFlipboard:url forItem:self.item];
-    
-    // Let delegate know
-    [[self.delegate fl_ifRespondsToSelector] mraidContainerView:self didOpenURL:url];
+    [[UIApplication sharedApplication] openURL:url];
 }
 
 - (void)expand
 {
-    // Log expand metric
-    [[FLAdManager defaultManager] tryLogTapToExpandForItem:self.item];
-    
     // Update state
     self.state = FLMRAIDStateExpanded;
     
@@ -553,9 +482,6 @@ static NSString *const kFLMScriptHandlerName = @"FlipboardMRAIDBridge";
 
 - (void)closeExpandedState
 {
-    // Log close metric
-    [[FLAdManager defaultManager] tryLogMetricWithValue:self.item.videoCollapseValueString trackingURLStrings:self.ad.videoCollapseTrackingURLStrings];
-    
     // Update state
     self.state = FLMRAIDStateDefault;
     
@@ -574,26 +500,18 @@ static NSString *const kFLMScriptHandlerName = @"FlipboardMRAIDBridge";
 // Note: all actions below correspond to messages broadcast from bundled mraid.js
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message
 {
-    NSString *messageText = [message.body fl_ifIsKindOfClass:[NSString class]];
+    NSString *messageText = [message.body isKindOfClass:[NSString class]] ? message.body : nil;
     NSArray<NSString *> *messageComponents = [messageText componentsSeparatedByString:@" "];
-    NSString *action = [messageComponents safeObjectAtIndex:0];
-    NSString *parameter = [messageComponents safeObjectAtIndex:1];
+    NSString *action = messageComponents.count > 0 ? messageComponents[0] : nil;
+    NSString *parameter = messageComponents.count > 1 ? messageComponents[1] : nil;
     
     // Ready to show
     if ([action isEqual:@"pageDidLoad"]) {
         // Ready to show
         self.state = FLMRAIDStateDefault;
         
-        // Try create session and log impression
-        [self tryUpdateOMSDKSessionViewability];
-        
-        // Fire content ready notification so ad can be inserted
-        if (self.item.topAdItem != nil) {
-            NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
-            [userInfo setObjectOrNil:[FLAdManager defaultManager].currentSection forKey:kFLAdManagerSectionUserInfoKey];
-            [userInfo setObjectOrNil:[FLAdManager defaultManager].currentItem forKey:kFLAdManagerItemUserInfoKey];
-            [[NSNotificationCenter defaultCenter] postNotificationName:kFLAdManagerNextAdContentDidBecomeReadyNotification object:self userInfo:nil];
-        }
+        // Fire content ready notification so ad can be presented
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFLMRAIDAdPageDidLoad object:self userInfo:nil];
     }
     // Open events
     else if ([action hasPrefix:@"open"]) {
@@ -619,15 +537,8 @@ static NSString *const kFLMScriptHandlerName = @"FlipboardMRAIDBridge";
         self.useCustomCloseButtonForExpandedState = [parameter isEqual:@"true"];
     }
     // Log events
-    // CJC
     else if ([action hasPrefix:@"log"]) {
-        BOOL shouldLogMRAIDMessages = YES;
-        if (shouldLogMRAIDMessages) {
-            // Remove
-            //NSString *cleanedMessageText = [messageText stringByReplacingOccurrencesOfString:@"(I-mraid.js) " withString:@""];
-            //cleanedMessageText = [cleanedMessageText stringByReplacingOccurrencesOfString:@"(D-mraid.js) " withString:@""];
-            [FLSharedAdLogger appendFormat:@"mraid %@", messageText];
-        }
+        NSLog(@"mraid %@", messageText);
     }
 }
 
