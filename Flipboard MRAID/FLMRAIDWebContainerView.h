@@ -25,7 +25,6 @@ extern NSString *const kFLMRAIDAdPageDidLoad;
 
 @property (nonatomic, strong) NSString *adHTMLString;
 @property (nonatomic, assign, readonly) FLMRAIDState state;
-@property (nonatomic, weak) NSObject<FLMRAIDWebContainerViewDelegate> *delegate;
 
 // Manual control of viewability changes in a scrolling context
 @property (nonatomic, assign, getter=isViewableOverride) BOOL viewableOverride;
