@@ -1,11 +1,12 @@
 //  Copyright (c) 2014 Google. All rights reserved.
 
 @import GoogleMobileAds;
+@import CoreGraphics;
+@import WebKit;
 
 #import "ViewController.h"
 #import "SettingsViewController.h"
 #import "Settings.h"
-#import <WebKit/WebKit.h>
 #import "FLMRAIDWebContainerView.h"
 
 @interface ViewController () <DFPBannerAdLoaderDelegate, GADUnifiedNativeAdLoaderDelegate, GADAppEventDelegate>
