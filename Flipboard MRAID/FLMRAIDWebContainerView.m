@@ -25,24 +25,6 @@ NSString *const kFLMRAIDAdPageDidLoad = @"FLMRAIDAdDidLoadPage";
 
 @implementation FLMRAIDWebContainerView
 
-- (NSString *)adHTMLString
-{
-    // CJC: revisit
-    return @"";
-}
-
-- (CGFloat)adWidth
-{
-    // CJC: revisit
-    return UIScreen.mainScreen.bounds.size.width;
-}
-
-- (CGFloat)adHeight
-{
-    // CJC: revisit
-    return UIScreen.mainScreen.bounds.size.height;
-}
-
 - (void)setState:(FLMRAIDState)state
 {
     if (_state != state) {
@@ -125,7 +107,7 @@ NSString *const kFLMRAIDAdPageDidLoad = @"FLMRAIDAdDidLoadPage";
     // Inject some reset styles with our loading background color, and ad size.
     static NSString *const kFLMRAIDWrapperCSSFormat = @"<style>html, body { margin: 0; padding: 0; background: #%@; width: %fpx; height: %fpx; }</style>";
     NSString *backgroundColorHex = @"000000";
-    NSString *css = [NSString stringWithFormat:kFLMRAIDWrapperCSSFormat, backgroundColorHex, self.adWidth, self.adHeight];
+    NSString *css = [NSString stringWithFormat:kFLMRAIDWrapperCSSFormat, backgroundColorHex, self.adPreferredSize.width, self.adPreferredSize.height];
     return css;
 }
 
