@@ -25,7 +25,6 @@ extern NSString *const kFLMRAIDAdPageDidLoad;
 
 @property (nonatomic, strong) NSString *adHTMLString;
 @property (nonatomic, assign) CGSize adPreferredSize;
-@property (nonatomic, assign) BOOL adPrefersFullscreen;
 @property (nonatomic, assign, readonly) FLMRAIDState state;
 
 // Manual control of viewability changes in a scrolling context
