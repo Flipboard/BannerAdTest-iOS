@@ -9,11 +9,16 @@
 #import "Settings.h"
 #import "FLMRAIDWebContainerView.h"
 
-@interface ViewController () <DFPBannerAdLoaderDelegate, GADUnifiedNativeAdLoaderDelegate, GADAppEventDelegate>
+NSString *const kFLDFPMRAIDCustomTemplateID = @"11865507";
+NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
+
+@interface ViewController () <DFPBannerAdLoaderDelegate, GADUnifiedNativeAdLoaderDelegate, GADNativeCustomTemplateAdLoaderDelegate, GADAppEventDelegate>
 
 // Google Ads
 @property (nonatomic, strong) GADAdLoader *loader;
 @property (nonatomic, strong) GADNativeCustomTemplateAd *customTemplateAd;
+@property (nonatomic, copy) NSString *customTemplateCeltraTag;
+
 
 // Ad views
 @property (nonatomic, strong) UIView *currentAdView;
@@ -148,6 +153,10 @@
     // Destroy the ad view
     [self destroyAdView];
     
+    // Drop custom template and celtra tag
+    self.customTemplateAd = nil;
+    self.customTemplateCeltraTag = nil;
+    
     // Reset flags
     self.adWantsFullscreen = NO;
     self.adIsPreloading = NO;
@@ -172,7 +181,7 @@
     NSString *unitID = Settings.shared.unitID;
     
     // Banner and native types (unified request)
-    NSArray *adTypes = @[kGADAdLoaderAdTypeDFPBanner, kGADAdLoaderAdTypeUnifiedNative];
+    NSArray *adTypes = @[kGADAdLoaderAdTypeDFPBanner, kGADAdLoaderAdTypeUnifiedNative, kGADAdLoaderAdTypeNativeCustomTemplate];
     
     // Create the request
     DFPRequest *request = [DFPRequest request];
@@ -231,6 +240,12 @@
     ];
 }
 
+- (nonnull NSArray<NSString *> *)nativeCustomTemplateIDsForAdLoader:(nonnull GADAdLoader *)adLoader
+{
+    // The custom template we use for MRAID ads
+    return @[kFLDFPMRAIDCustomTemplateID];
+}
+
 - (void)adLoader:(GADAdLoader *)adLoader didReceiveDFPBannerView:(DFPBannerView *)bannerView
 {
     NSLog(@"$$$$$ adLoader:didReceiveDFPBannerView:");
@@ -269,6 +284,38 @@
     // Update the UI
     [self updateUI];
 }
+
+- (void)adLoader:(nonnull GADAdLoader *)adLoader didReceiveNativeCustomTemplateAd:(nonnull GADNativeCustomTemplateAd *)customTemplateAd
+{
+    NSLog(@"$$$$$ adLoader:didReceiveNativeCustomTemplateAd:");
+    
+    // Abandon the ad if the fetch has been cancelled
+    if (!self.loader) {
+        return;
+    }
+    
+    // Extract the Celtra HTML tag
+    self.customTemplateCeltraTag = [customTemplateAd stringForKey:kFLDFPMRAIDCustomTemplateCeltraTagKey];
+    
+    // Create the MRAID web view
+    FLMRAIDWebContainerView *mraidWebView = [[FLMRAIDWebContainerView alloc] initWithFrame:CGRectZero];
+    mraidWebView.adHTMLString = self.customTemplateCeltraTag;
+    mraidWebView.adPreferredSize = CGSizeMake(1, 1); // Fullscreen
+    
+    // Hold onto the web view and set it as the current ad view
+    self.flipboardMRAIDView = mraidWebView;
+    self.currentAdView = mraidWebView;
+    
+    // Hold onto the ad
+    self.customTemplateAd = customTemplateAd;
+    
+    // Always fullscreen
+    self.adWantsFullscreen = YES;
+    
+    // Update the UI
+    [self updateUI];
+}
+
 
 - (void)adLoader:(GADAdLoader *)adLoader didFailToReceiveAdWithError:(GADRequestError *)error
 {
