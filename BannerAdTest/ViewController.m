@@ -240,7 +240,7 @@
         return;
     }
     
-    // Grab the banner
+    // Hold onto the banner and set it as the current ad view
     self.googleBannerView = bannerView;
     self.currentAdView = bannerView;
     
