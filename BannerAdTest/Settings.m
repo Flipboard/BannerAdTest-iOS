@@ -40,32 +40,32 @@ static NSString *kFLManualImpressions = @"FLManualImpressions";
         self.unitID = [self defaultStringForKey:kFLUnitID fallback:@"/21709104563/testing/celtra/celtra18"];
         
         // Preload
-        self.preload = [self defaultBoolForKey:kFLPreload fallback:YES];
+        self.shouldPreload = [self defaultBoolForKey:kFLPreload fallback:YES];
         
         // Preload offscreen
         // Doesn't seem to work, so leaving off by default.
-        self.preloadOffscreen = [self defaultBoolForKey:kFLPreloadOffscreen fallback:NO];
+        self.shouldPreloadOffscreen = [self defaultBoolForKey:kFLPreloadOffscreen fallback:NO];
         
         // Preload in detached parent view.
-        self.preloadInDetachedParentView = [self defaultBoolForKey:kFLPreloadInDetachedParentView fallback:NO];
+        self.shouldPreloadInDetachedParentView = [self defaultBoolForKey:kFLPreloadInDetachedParentView fallback:NO];
         
         // Wait for preloading completion event.
-        self.waitForPreloadingCompletionEvent = [self defaultBoolForKey:kFLWaitForPreloadingCompletionEvent fallback:YES];
+        self.shouldWaitForPreloadingCompletionEvent = [self defaultBoolForKey:kFLWaitForPreloadingCompletionEvent fallback:YES];
         
         // Hide after preloading
-        self.hideAfterPreloading = [self defaultBoolForKey:kFLHideAfterPreloading fallback:NO];
+        self.shouldHideAfterPreloading = [self defaultBoolForKey:kFLHideAfterPreloading fallback:NO];
         
         // Remove from hierarchy after preloading
-        self.removeFromParentAfterPreloading = [self defaultBoolForKey:kFLRemoveFromParentAfterPreloading fallback:NO];
+        self.shouldRemoveFromParentAfterPreloading = [self defaultBoolForKey:kFLRemoveFromParentAfterPreloading fallback:NO];
         
         // Inject visibility javascript
-        self.injectVisibilityJavascript = [self defaultBoolForKey:kFLInjectVisibilityJavascript fallback:NO];
+        self.shouldInjectVisibilityJavascript = [self defaultBoolForKey:kFLInjectVisibilityJavascript fallback:NO];
         
         // Auto-present
-        self.autoPresent = [self defaultBoolForKey:kFLAutoPresent fallback:YES];
+        self.shouldAutoPresent = [self defaultBoolForKey:kFLAutoPresent fallback:YES];
         
         // Manual impressions
-        self.manualImpressions = [self defaultBoolForKey:kFLManualImpressions fallback:NO];
+        self.shouldFireManualImpressions = [self defaultBoolForKey:kFLManualImpressions fallback:NO];
     }
     return self;
 }
@@ -139,57 +139,57 @@ static NSString *kFLManualImpressions = @"FLManualImpressions";
     [self.defaults setObject:unitID forKey:kFLUnitID];
 }
 
-- (void)setPreload:(BOOL)preload
+- (void)setShouldPreload:(BOOL)preload
 {
-    _preload = preload;
+    _shouldPreload = preload;
     [self.defaults setBool:preload forKey:kFLPreload];
 }
 
-- (void)setPreloadOffscreen:(BOOL)preloadOffscreen
+- (void)setShouldPreloadOffscreen:(BOOL)preloadOffscreen
 {
-    _preloadOffscreen = preloadOffscreen;
+    _shouldPreloadOffscreen = preloadOffscreen;
     [self.defaults setBool:preloadOffscreen forKey:kFLPreloadOffscreen];
 }
 
-- (void)setPreloadInDetachedParentView:(BOOL)detached
+- (void)setShouldPreloadInDetachedParentView:(BOOL)detached
 {
-    _preloadInDetachedParentView = detached;
+    _shouldPreloadInDetachedParentView = detached;
     [self.defaults setBool:detached forKey:kFLPreloadInDetachedParentView];
 }
 
-- (void)setWaitForPreloadingCompletionEvent:(BOOL)wait
+- (void)setShouldWaitForPreloadingCompletionEvent:(BOOL)wait
 {
-    _waitForPreloadingCompletionEvent = wait;
+    _shouldWaitForPreloadingCompletionEvent = wait;
     [self.defaults setBool:wait forKey:kFLWaitForPreloadingCompletionEvent];
 }
 
-- (void)setHideAfterPreloading:(BOOL)hide
+- (void)setShouldHideAfterPreloading:(BOOL)hide
 {
-    _hideAfterPreloading = hide;
+    _shouldHideAfterPreloading = hide;
     [self.defaults setBool:hide forKey:kFLHideAfterPreloading];
 }
 
-- (void)setRemoveFromParentAfterPreloading:(BOOL)remove
+- (void)setShouldRemoveFromParentAfterPreloading:(BOOL)remove
 {
-    _removeFromParentAfterPreloading = remove;
+    _shouldRemoveFromParentAfterPreloading = remove;
     [self.defaults setBool:remove forKey:kFLRemoveFromParentAfterPreloading];
 }
 
-- (void)setInjectVisibilityJavascript:(BOOL)inject
+- (void)setShouldInjectVisibilityJavascript:(BOOL)inject
 {
-    _injectVisibilityJavascript = inject;
+    _shouldInjectVisibilityJavascript = inject;
     [self.defaults setBool:inject forKey:kFLInjectVisibilityJavascript];
 }
 
-- (void)setAutoPresent:(BOOL)autoPresent
+- (void)setShouldAutoPresent:(BOOL)autoPresent
 {
-    _autoPresent = autoPresent;
+    _shouldAutoPresent = autoPresent;
     [self.defaults setBool:autoPresent forKey:kFLAutoPresent];
 }
 
-- (void)setManualImpressions:(BOOL)manualImpressions
+- (void)setShouldFireManualImpressions:(BOOL)manualImpressions
 {
-    _manualImpressions = manualImpressions;
+    _shouldFireManualImpressions = manualImpressions;
     [self.defaults setBool:manualImpressions forKey:kFLManualImpressions];
 }
 

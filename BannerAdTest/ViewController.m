@@ -206,19 +206,19 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
     self.adIsFinishedPreloading = YES;
     
     // Hide after preloading?
-    if (Settings.shared.hideAfterPreloading) {
+    if (Settings.shared.shouldHideAfterPreloading) {
         NSLog(@"$$$$$ Hiding ad view");
         self.currentAdView.hidden = YES;
     }
     
     // Remove from hierarchy after preloading?
-    if (Settings.shared.removeFromParentAfterPreloading) {
+    if (Settings.shared.shouldRemoveFromParentAfterPreloading) {
         NSLog(@"$$$$$ Removing ad view from parent");
         [self.currentAdView removeFromSuperview];
     }
     
     // Auto-present?
-    if (Settings.shared.autoPresent) {
+    if (Settings.shared.shouldAutoPresent) {
         // Layout
         [self layoutAdView];
     }
@@ -267,7 +267,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
     self.googleBannerView.appEventDelegate = self;
     
     // Register for manual impressions if desired
-    if (Settings.shared.manualImpressions) {
+    if (Settings.shared.shouldFireManualImpressions) {
         self.googleBannerView.enableManualImpressions = YES;
     }
     
@@ -345,7 +345,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
     
     // PRELOADING HACK
     // Web views won't preload unless they're attached to a window
-    if (Settings.shared.preload) {
+    if (Settings.shared.shouldPreload) {
         // Logging
         NSLog(@"$$$$$ Using preloading hack");
         NSLog(@"$$$$$ Adding ad view to main window");
@@ -353,7 +353,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
         // Two possible parent views for the preloading ad view:
         // 1. A view that isn't part of the hierarchy (suggested by Google)
         // 2. The app's main window
-        if (Settings.shared.preloadInDetachedParentView) {
+        if (Settings.shared.shouldPreloadInDetachedParentView) {
             // Add the ad view to the detached view so it can preload
             [self.detachedParentView addSubview:self.currentAdView];
         } else {
@@ -362,7 +362,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
         }
         
         // Optionally move the ad view outside of the screen frame
-        if (Settings.shared.preloadOffscreen) {
+        if (Settings.shared.shouldPreloadOffscreen) {
             NSLog(@"$$$$$ Moving ad view outside of screen bounds");
             CGRect offscreenAdViewFrame = self.currentAdView.frame;
             offscreenAdViewFrame.origin.x += UIScreen.mainScreen.bounds.size.width;
@@ -373,7 +373,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
         self.adIsPreloading = YES;
         
         // Preload for a constant amount of time if we're not waiting for a completion event
-        if (Settings.shared.preload && !Settings.shared.waitForPreloadingCompletionEvent) {
+        if (Settings.shared.shouldPreload && !Settings.shared.shouldWaitForPreloadingCompletionEvent) {
             // Wait a specified amount of time for preloading to complete
             NSTimeInterval kPreloadingTime = 5.0;
             [self performSelector:@selector(loadingAndPreloadingDidFinish) withObject:nil afterDelay:kPreloadingTime];
@@ -399,7 +399,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
     
     static NSString *kCeltraLoadedEventName = @"celtraLoaded";
     if ([name isEqual:kCeltraLoadedEventName]) {
-        if (Settings.shared.preload && Settings.shared.waitForPreloadingCompletionEvent) {
+        if (Settings.shared.shouldPreload && Settings.shared.shouldWaitForPreloadingCompletionEvent) {
             [self loadingAndPreloadingDidFinish];
         }
     }
@@ -487,13 +487,13 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
     // The GMA SDK seems to think ads are visibile when they're not.
     // To work around this, inject javascript to tell the ad view that it's *actually* visible.
     // Wait until the next runloop to avoid timing issues.
-    if (Settings.shared.injectVisibilityJavascript) {
+    if (Settings.shared.shouldInjectVisibilityJavascript) {
         NSLog(@"$$$$$ Injecting banner visibility javascript");
         [self performSelector:@selector(setAdViewVisibilityJavascriptFlagToYes) withObject:nil afterDelay:0.0];
     }
     
     // Manual impressions if desired
-    if (Settings.shared.manualImpressions) {
+    if (Settings.shared.shouldFireManualImpressions) {
         NSLog(@"$$$$$ Firing manual impression");
         [self.googleBannerView recordImpression]; // Google banner
         [self.customTemplateAd recordImpression]; // Flipboard MRAID
@@ -610,7 +610,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
 
 - (BOOL)canPresentAd
 {
-    return self.currentAdView != nil && ![self hasAdSubview] && ![self isPreloadingAd] && !Settings.shared.autoPresent;
+    return self.currentAdView != nil && ![self hasAdSubview] && ![self isPreloadingAd] && !Settings.shared.shouldAutoPresent;
 }
 
 @end

@@ -26,31 +26,31 @@
 @property (nonatomic, readonly) NSString *simplifiedUnitID;
 
 // Should the preloading hack be used.
-@property (nonatomic, assign) BOOL preload;
+@property (nonatomic, assign) BOOL shouldPreload;
 
 // Place preloading views outside of the screen's bounds.
-@property (nonatomic, assign) BOOL preloadOffscreen;
+@property (nonatomic, assign) BOOL shouldPreloadOffscreen;
 
 // Place preloading views in a parent view detached from the view hierarchy.
-@property (nonatomic, assign) BOOL preloadInDetachedParentView;
+@property (nonatomic, assign) BOOL shouldPreloadInDetachedParentView;
 
 // Preload until the creative signals that it's done preloding.
 // If false, creatives are given a constant amount of time to preload (currently 5s).
-@property (nonatomic, assign) BOOL waitForPreloadingCompletionEvent;
+@property (nonatomic, assign) BOOL shouldWaitForPreloadingCompletionEvent;
 
 // Hide banners after they've finished preloading.
-@property (nonatomic, assign) BOOL hideAfterPreloading;
+@property (nonatomic, assign) BOOL shouldHideAfterPreloading;
 
 // Remove banners from parent views after preloading.
-@property (nonatomic, assign) BOOL removeFromParentAfterPreloading;
+@property (nonatomic, assign) BOOL shouldRemoveFromParentAfterPreloading;
 
 // Inject javascript to let the banner know when it's *actually* visible.
-@property (nonatomic, assign) BOOL injectVisibilityJavascript;
+@property (nonatomic, assign) BOOL shouldInjectVisibilityJavascript;
 
 // Should the ad automatically be presented once it's done downloading (and preloading).
-@property (nonatomic, assign) BOOL autoPresent;
+@property (nonatomic, assign) BOOL shouldAutoPresent;
 
 // Manually report impressions rather than letting the SDK do it automatically.
-@property (nonatomic, assign) BOOL manualImpressions;
+@property (nonatomic, assign) BOOL shouldFireManualImpressions;
 
 @end
