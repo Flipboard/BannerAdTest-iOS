@@ -35,9 +35,10 @@
         unitIDCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"UnitIDCell"];
     }
     
-    // Text
-    NSString *unitID = Settings.allPossibleUnitIDs[indexPath.item];
-    unitIDCell.textLabel.text = unitID;
+    // Override name
+    NSString *name = Settings.allPossibleUnitIDs.allKeys[indexPath.item];
+    NSString *unitID = Settings.allPossibleUnitIDs[name];
+    unitIDCell.textLabel.text = name;
     
     // Checkmark
     BOOL checked = [unitID isEqual:Settings.shared.unitID];
@@ -49,7 +50,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Save the selected unit ID
-    NSString *unitID = Settings.allPossibleUnitIDs[indexPath.item];
+    NSString *name = Settings.allPossibleUnitIDs.allKeys[indexPath.item];
+    NSString *unitID = Settings.allPossibleUnitIDs[name];
     Settings.shared.unitID = unitID;
     
     // Deselect the cell
@@ -69,7 +71,8 @@
         UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
         
         // Hide/show the checkmark
-        NSString *unitID = Settings.allPossibleUnitIDs[index];
+        NSString *name = Settings.allPossibleUnitIDs.allKeys[index];
+        NSString *unitID = Settings.allPossibleUnitIDs[name];
         BOOL checked = [unitID isEqual:Settings.shared.unitID];
         cell.accessoryType = checked ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     }

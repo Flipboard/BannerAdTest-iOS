@@ -8,29 +8,22 @@
 
 #import <Foundation/Foundation.h>
 
-// Container types
-typedef NS_ENUM(NSUInteger, MRAIDContainerType) {
-    MRAIDContainerTypeDFPBannerView = 0, // Google
-    MRAIDContainerTypeCustomMRAID // Flipboard
-};
-
-
 @interface Settings : NSObject
 
 // Singleton
 + (instancetype)shared;
 
-// Should the preloading hack be used.
-@property (nonatomic, assign) MRAIDContainerType containerType;
-
-// All the bundled unit IDs for testing.
-+ (NSArray<NSString *> *)allPossibleUnitIDs;
-
-// Last componenet of the Unit ID only.
-@property (nonatomic, readonly) NSString *prettyUnitID;
+// All the bundled unit IDs for testing (name / unit ID pairs)
++ (NSDictionary<NSString *, NSString *> *)allPossibleUnitIDs;
 
 // Unit ID
 @property (nonatomic, copy) NSString *unitID;
+
+// Name of the unit ID.
+@property (nonatomic, readonly) NSString *unitIDName;
+
+// Last component of the unit ID only.
+@property (nonatomic, readonly) NSString *simplifiedUnitID;
 
 // Should the preloading hack be used.
 @property (nonatomic, assign) BOOL preload;

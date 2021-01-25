@@ -36,9 +36,6 @@ static NSString *kFLManualImpressions = @"FLManualImpressions";
 {
     self = [super init];
     if (self) {
-        // Container type
-        self.containerType = [self defaultIntegerForKey:kFLContainerType fallback:MRAIDContainerTypeDFPBannerView];
-        
         // Unit ID
         self.unitID = [self defaultStringForKey:kFLUnitID fallback:@"/21709104563/testing/celtra/celtra18"];
         
@@ -94,51 +91,30 @@ static NSString *kFLManualImpressions = @"FLManualImpressions";
     return result;
 }
 
-+ (NSArray<NSString *> *)allPossibleUnitIDs
++ (NSDictionary<NSString *, NSString *> *)allPossibleUnitIDs
 {
-    return @[
+    return @{
          // 300x250 banner
-         @"/21709104563/testing/display_300_250",
+         @"300x250 Banner" : @"/21709104563/testing/display_300_250",
          
          // 300x600 banner
-         @"/21709104563/testing/display_300_600",
+         @"300x600 Banner" : @"/21709104563/testing/display_300_600",
          
          // Simple fullscreen Celtra banner ad
-         @"/21709104563/testing/static_fsa",
+         @"Test FSA" : @"/21709104563/testing/static_fsa",
          
          // Fullscreen landscape Celtra video loop with tap to full video.
-         @"/21709104563/testing/cinemaloop_horizontal",
+         @"CinemaLoop Horizontal" : @"/21709104563/testing/cinemaloop_horizontal",
          
          // Fullscreen portrait Celtra video loop with tap to full video.
-         @"/21709104563/testing/cinemaloop_vertical",
+         @"CinemaLoop Vertical" : @"/21709104563/testing/cinemaloop_vertical",
          
-         // Internal tests
-         @"/21709104563/testing/celtra/celtra1",
-         @"/21709104563/testing/celtra/celtra2",
-         @"/21709104563/testing/celtra/celtra3",
-         @"/21709104563/testing/celtra/celtra4",
-         @"/21709104563/testing/celtra/celtra5",
-         @"/21709104563/testing/celtra/celtra6",
+         // Autoplay video in DFPBannerView
+         @"Autoplay Video Banner" : @"/21709104563/testing/celtra/celtra24",
          
-         // PBS DDT Auto Play
-         @"/21709104563/testing/celtra/celtra12",
-         
-         // PBS Monday Auto Play
-         @"/21709104563/testing/celtra/celtra13",
-         
-         // PBS Tonight Autoplay
-         @"/21709104563/testing/celtra/celtra15",
-         
-         // Ad council
-         @"/21709104563/testing/celtra/celtra18",
-         
-         // Video ad *with* javascript hack
-         @"/21709104563/testing/celtra/celtra20",
-         
-         // Autoplay video Celtra ads (banner and custom template)
-         @"/21709104563/testing/celtra/celtra24",
-         @"/21709104563/testing/celtra/celtra25"
-    ];
+         // Autoplay video in custom template
+         @"Autoplay Video Custom Template" : @"/21709104563/testing/celtra/celtra25"
+    };
 }
 
 - (NSUserDefaults *)defaults
@@ -146,13 +122,13 @@ static NSString *kFLManualImpressions = @"FLManualImpressions";
     return [NSUserDefaults standardUserDefaults];
 }
 
-- (void)setContainerType:(MRAIDContainerType)containerType
+
+- (NSString *)unitIDName
 {
-    _containerType = containerType;
-    [self.defaults setObject:@(containerType) forKey:kFLContainerType];
+    return [[[[self class] allPossibleUnitIDs] allKeysForObject:self.unitID] firstObject];
 }
 
-- (NSString *)prettyUnitID
+- (NSString *)simplifiedUnitID
 {
     return [self.unitID lastPathComponent];
 }
