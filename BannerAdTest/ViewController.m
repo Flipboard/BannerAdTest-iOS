@@ -53,6 +53,8 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
     [self reset];
     
     self.view.backgroundColor = [UIColor blackColor];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(flipboardMRAIDAdDidLoad) name:kFLMRAIDAdPageDidLoad object:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -195,6 +197,16 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
     
     // Load the request
     [self.loader loadRequest:request];
+}
+
+- (void)flipboardMRAIDAdDidLoad
+{
+    NSLog(@"flipboardMRAIDAdDidLoad");
+    
+    // Finish preloading if
+    if (Settings.shared.shouldPreload && Settings.shared.shouldWaitForPreloadingCompletionEvent) {
+        [self preloadingDidFinish];
+    }
 }
 
 - (void)preloadingDidFinish
