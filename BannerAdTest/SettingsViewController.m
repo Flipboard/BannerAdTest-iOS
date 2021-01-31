@@ -11,7 +11,6 @@
 
 @interface SettingsViewController ()
 
-//@property (nonatomic, weak) IBOutlet UISegmentedControl *containerSegmentedControl;
 @property (nonatomic, weak) IBOutlet UILabel *unitIDLabel;
 @property (nonatomic, weak) IBOutlet UISwitch *preloadSwitch;
 @property (nonatomic, weak) IBOutlet UITableViewCell *preloadOffscreenCell;
@@ -44,9 +43,6 @@
 
 - (void)updateUI
 {
-    // Container type
-    //self.containerSegmentedControl.selectedSegmentIndex = Settings.shared.containerType;
-    
     // Set unit ID label text.
     self.unitIDLabel.text = Settings.shared.unitIDName;
     
@@ -64,12 +60,6 @@
     // If preloading is off then disable related cells.
     [self setPreloadingSubcellsEnabled:Settings.shared.shouldPreload];
 }
-
-//- (IBAction)containerSegmentedControlChanged:(UISegmentedControl *)sender
-//{
-//    Settings.shared.containerType = sender.selectedSegmentIndex;
-//    [self updateUI];
-//}
 
 - (NSArray *)preloadingSubcells
 {
