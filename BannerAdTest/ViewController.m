@@ -197,7 +197,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
     [self.loader loadRequest:request];
 }
 
-- (void)loadingAndPreloadingDidFinish
+- (void)preloadingDidFinish
 {
     NSLog(@"$$$$$ Loading/preloading finished");
     
@@ -376,7 +376,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
         if (Settings.shared.shouldPreload && !Settings.shared.shouldWaitForPreloadingCompletionEvent) {
             // Wait a specified amount of time for preloading to complete
             NSTimeInterval kPreloadingTime = 5.0;
-            [self performSelector:@selector(loadingAndPreloadingDidFinish) withObject:nil afterDelay:kPreloadingTime];
+            [self performSelector:@selector(preloadingDidFinish) withObject:nil afterDelay:kPreloadingTime];
         }
     }
     // NO PRELOADING HACK
@@ -386,7 +386,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
         NSLog(@"$$$$$ Not using preloading hack");
         
         // Skip preloading
-        [self loadingAndPreloadingDidFinish];
+        [self preloadingDidFinish];
     }
     
     // Update the UI
@@ -400,7 +400,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
     static NSString *kCeltraLoadedEventName = @"celtraLoaded";
     if ([name isEqual:kCeltraLoadedEventName]) {
         if (Settings.shared.shouldPreload && Settings.shared.shouldWaitForPreloadingCompletionEvent) {
-            [self loadingAndPreloadingDidFinish];
+            [self preloadingDidFinish];
         }
     }
 }
