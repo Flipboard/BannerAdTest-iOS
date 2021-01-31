@@ -36,7 +36,7 @@ static NSString *kFLManualImpressionsKey = @"FLManualImpressions";
     self = [super init];
     if (self) {
         // Unit ID
-        self.unitID = [self defaultStringForKey:kFLUnitID fallback:@"/21709104563/testing/celtra/celtra18"];
+        self.unitID = [self defaultStringForKey:kFLUnitIDKey fallback:@"/21709104563/testing/celtra/celtra25"];
         
         // Preload
         self.shouldPreload = [self defaultBoolForKey:kFLPreloadKey fallback:NO];
