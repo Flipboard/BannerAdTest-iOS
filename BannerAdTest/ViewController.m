@@ -81,7 +81,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
         self.activityLabel.text = @"No Ad";
     }
     // Fetching
-    if ([self isFetchingAd]) {
+    else if ([self isFetchingAd]) {
         self.spinner.hidden = NO;
         [self.spinner startAnimating];
         self.activityLabel.text = @"Fetching";
