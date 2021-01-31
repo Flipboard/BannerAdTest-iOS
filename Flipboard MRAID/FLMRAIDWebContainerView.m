@@ -36,6 +36,8 @@ NSString *const kFLMRAIDAdPageDidLoad = @"FLMRAIDAdDidLoadPage";
 - (void)setViewable:(BOOL)viewable
 {
     if (_viewable != viewable) {
+        NSLog(@"$$$$$ FLMRAIDWebContainerView setViewable: %@", viewable ? @"true" : @"false");
+        
         _viewable = viewable;
         [self fireViewableChangeEventInWebview:[self isViewable]];
     }
@@ -59,7 +61,7 @@ NSString *const kFLMRAIDAdPageDidLoad = @"FLMRAIDAdDidLoadPage";
 
 - (BOOL)isPreloading
 {
-    // FLMRAIDCache attaches preloading views as a direct child of UIAppMainWindow.
+    // FLMRAIDCache attaches preloading views as a direct child of the app's main window.
     UIWindow *mainWindow = UIApplication.sharedApplication.delegate.window;
     BOOL isPreloading = (self.superview == mainWindow);
     return isPreloading;
@@ -76,6 +78,8 @@ NSString *const kFLMRAIDAdPageDidLoad = @"FLMRAIDAdDidLoadPage";
     }
     
     if (shouldPreload) {
+        NSLog(@"$$$$$ FLMRAIDWebContainerView Preloading");
+        
         WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
         WKUserContentController *userContentController = [[WKUserContentController alloc] init];
         config.userContentController = userContentController;
@@ -426,6 +430,8 @@ static NSString *const kFLMScriptHandlerName = @"FlipboardMRAIDBridge";
     }
     
     if (shouldSet) {
+        NSLog(@"$$$$$ FLMRAIDWebContainerView Page Ready");
+        
         // Initialize MRAID values
         [self setLogLevelInWebview];
         [self setPlacementTypeInWebview];
@@ -492,35 +498,42 @@ static NSString *const kFLMScriptHandlerName = @"FlipboardMRAIDBridge";
         // Ready to show
         self.state = FLMRAIDStateDefault;
         
+        NSLog(@"$$$$$ mraid pageDidLoad");
+        
         // Fire content ready notification so ad can be presented
         [[NSNotificationCenter defaultCenter] postNotificationName:kFLMRAIDAdPageDidLoad object:self userInfo:nil];
     }
     // Open events
     else if ([action hasPrefix:@"open"]) {
+        NSLog(@"$$$$$ mraid open");
         NSURL *url = [NSURL URLWithString:parameter];
         [self openURL:url];
     }
     // Play video
     else if ([action hasPrefix:@"playVideo"]) {
         // TODO: Play natively
+        NSLog(@"$$$$$ mraid playVideo");
         NSURL *url = [NSURL URLWithString:parameter];
         [self openURL:url];
     }
     // Expand
     else if ([action hasPrefix:@"expand"]) {
+        NSLog(@"$$$$$ mraid expand");
         [self expand];
     }
     // Close
     else if ([action hasPrefix:@"close"]) {
+        NSLog(@"$$$$$ mraid close");
         [self closeExpandedState];
     }
     // Custom close button for expanded views
     else if ([action hasPrefix:@"useCustomClose"]) {
+        NSLog(@"$$$$$ useCustomClose");
         self.useCustomCloseButtonForExpandedState = [parameter isEqual:@"true"];
     }
     // Log events
     else if ([action hasPrefix:@"log"]) {
-        NSLog(@"mraid %@", messageText);
+        NSLog(@"$$$$$ mraid message: %@", messageText);
     }
 }
 
