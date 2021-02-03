@@ -8,10 +8,10 @@
 	if (window.mraid) { return; };
 
 	// Override console.log to pipe messages to native console.
-    // CJC: Comment out if you need to see messages in external web debuggers
-	console.log = function(msg) {
-		window.webkit.messageHandlers.FlipboardMRAIDBridge.postMessage("log: " + msg);
-	};
+    // Note: this will prevent external web debuggers from seeing messages.
+	//console.log = function(msg) {
+	//	window.webkit.messageHandlers.FlipboardMRAIDBridge.postMessage("log: " + msg);
+	//};
 
 	console.log("MRAID object loading...");
 
