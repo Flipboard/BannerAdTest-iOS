@@ -359,7 +359,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
     // Web views won't preload unless they're attached to a window
     if (Settings.shared.shouldPreload) {
         // Logging
-        NSLog(@"$$$$$ Using preloading hack");
+        NSLog(@"$$$$$ Preloading");
         NSLog(@"$$$$$ Adding ad view to main window");
         
         // Two possible parent views for the preloading ad view:
@@ -370,6 +370,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
             [self.detachedParentView addSubview:self.currentAdView];
         } else {
             // Add the ad view to the main window so it can preload
+            // Put it behind all other subviews so that it's not visible
             [self.mainWindow insertSubview:self.currentAdView atIndex:0];
         }
         
@@ -377,7 +378,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
         if (Settings.shared.shouldPreloadOffscreen) {
             NSLog(@"$$$$$ Moving ad view outside of screen bounds");
             CGRect offscreenAdViewFrame = self.currentAdView.frame;
-            offscreenAdViewFrame.origin.x += UIScreen.mainScreen.bounds.size.width;
+            offscreenAdViewFrame.origin.x = UIScreen.mainScreen.bounds.size.width;
             self.currentAdView.frame = offscreenAdViewFrame;
         }
         
@@ -441,9 +442,7 @@ NSString *const kFLDFPMRAIDCustomTemplateCeltraTagKey = @"CeltraTag";
     CGRect fullscreenFrame = self.view.bounds;
     
     // Safe area insets
-    if (@available(iOS 11.0, *)) {
-        fullscreenFrame = UIEdgeInsetsInsetRect(fullscreenFrame, self.mainWindow.safeAreaInsets);
-    }
+    fullscreenFrame = UIEdgeInsetsInsetRect(fullscreenFrame, self.mainWindow.safeAreaInsets);
     
     // Bottom toolbar
     if (self.toolbar) {
